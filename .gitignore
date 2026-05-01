@@ -6,6 +6,7 @@
 **/pyvenv.cfg
 **/__pycache__/
 *.pyc
+leak_detector_env/
 
 # Sensitive Secrets (DO NOT REMOVE)
 .env
