@@ -1,0 +1,751 @@
+﻿CHAPTER 1 
+INTRODUCTION 
+Dysarthria is a motor speech disorder that leads to difficulty in speech production and, affects the ability to convey the thoughts in a comprehensible manner. The speech disorder that dysarthria affects the speech, called the social isolation and mental health problems for these people. Treatment for dysarthria mostly just tackles certain problems like the difficulty of pronouncing words and tone disturbance. However, the treatment lacks the function of targeting the root motor impairments. The current interventions come up short in terms of the ability to comprehensively help speech clarity. So, it is evident that there is a need for the more viable approach of dysarthria voice reconstruction system that can analyze the individual speech patterns of each and everyone. 
+Dysarthria complicates understanding and communication for people, they don't keep to fluency what disturbs their mental health. The efficacy of currently used treatments to help in making speech better is somehow limited. Our approach involves the use of smart technology to manage voice production in dysarthria, thereby, improving speech. These numerous users actually themselves give this system a boost, teaching it to sound better and better with each person. Our view is that such treatment will boost the confidence of the dysarthria patients and they would be able to mingle and socialize in a better way. Dysarthria is a form of speech impairment, where individuals struggle to articulate words. 
+We propose a machine learning approach to voice reconstruction for such individuals. The system is based on the deep neural network which recovers the voice of the dysarthric individuals, and after processing, their speech sounds more intelligible and natural. 
+1.1. Motivation 
+Effective communication is a basic human need, yet for people with dysarthria, a condition affecting speech clarity, can find such a task quite difficult. As the reason why this project take place is driven by the desire to touch the lives of those who are on this trail. Nowadays technologies, although useful, have their own drawbacks, and they do not always handle correctly the difficult cases when unique speech patterns are involved. In this aim, it's time to clarify the existing obstacles and to produce the "Dysarthria Voice Reconstruction system" for the patients with dysarthria in order for them to communicate more easily and 
+comfortably. 
+2 
+1.2. Problem Statement 
+People with dysarthria, a condition affecting speech clarity due to muscle control issues, a proper conversation is impossible. The current solutions for dysarthria may be highly inadequate because they don't have the precision and granularity needed to unravel various speech patterns of people with this condition. The challenge is to develop a Dysarthria Voice Reconstruction system which will cope successfully with the constraints, such as accurate analysis and immediate adaptation for the truly natural and clear voice generation. To ensure that all the stakeholders involved become understood as well as the overall life quality for the affected people is improved, solving this problem has great importance. 
+1.3. Goals and Objectives 
+The main goal of the Dysarthria Voice Reconstruction project is to improve communication accessibility for individuals with dysarthria. This involves addressing the limitations of existing solutions and developing a system that provides the following goals: 
+• 
+• 
+Attain accurate comprehension and transcription of dysarthric speech. 
+Create natural-sounding, easy-to-understand computer-generated voices. 
+Design a user-friendly system accessible to individuals of technical background. Incorporate algorithms for highly accurate dysarthric speech recognition. 
+Ensure consistent, reliable performance across various environments. 
+By reaching these goals and objectives, we can make talking and expressing thoughts a lot smoother and more comfortable for people with dysarthria. 
+1.4. Scope of the Study 
+In this study, we're looking closely at the Dysarthria Voice Reconstruction project. This is what we want to know, how good the speech device is at understanding dysarthric speech of different types. We are taking care of the computer speech quality, and we want to make it as natural and easy to understand as possible. Finally, we are doing everything possible to make sure that the system is compatible with all sorts of devices, including computers and phones 
+3 
+with the aim of reaching as many people as possible. The results from this research allow us to understand how the system functions and helps people with dysarthria communicate effectively. 
+1.5. Process Model 
+Figure 1.1 outlines the journey from capturing dysarthric voice to generating machine voice. It starts with recording speech, then converts it to text, and finally transforms the text into a natural-sounding machine voice. Each step is carefully planned to ensure a smooth and accurate reconstruction of speech, making communication more accessible for individuals with dysarthria. 
+1. Input: The system takes a dysarthric speech as input, which is then transcribed 
+into text using a Speech-to-Text system. 
+2. Speech-to-Text: Speech is then converted to text for further processing. 
+3. Text Processing: The transcribed text is then processed to improve its 
+readability and grammatical correctness. 
+4. Text-to-Speech: The processed text is then passed through a Text-to-Speech 
+(TTS) system to generate a natural-sounding speech signal. 
+5. Output: The output is an intelligible and natural-sounding normal speech. 
+Input: Voice 
+Detect 
+Voice 
+Convert into Text 
+Output: Normal 
+voice 
+Figure 1.1: Process Model 
+Convert into voice 
+4 
+1.6. Nature of the Project 
+This project focuses on creating a system to support individuals with dysarthria, a condition affecting speech production. The main goal is to convert dysarthric speech into written text using a Speech-to-Text (STT) system and then generate machine-generated voice from the processed text using Text-to-Speech (TTS) technology. The project involves refining the transcribed text through additional processing and analysis to improve accuracy. Special attention is given to enhancing the quality of the synthesized voice, considering the unique challenges posed by dysarthric speech. The development includes a user-friendly interface for tasks like uploading audio files and real-time speech input. 
+1.7. Overview of Report 
+Before getting deeper into the specifics of each chapter, in this dedicated section, we present an overview of the report. 
+In first chapter, we introduce the concept of Dysarthria, highlighting its societal effects. The chapter covers the motivation, problem statement, project objectives, scope, process model, and the core nature of our project. 
+The second chapter provides an in-depth analysis of the problem's background. We review existing approaches, research contributions, and systems in the domain of Dysarthric Voice Reconstruction. Moreover, this chapter, after reviewing the existing approaches, presents a comparative analysis between these existing systems and our proposed solution thereby formulating the motivation for this project. 
+Third chapter details the essential requirements for our project. It mainly highlights functional, non-functional, resource, software, and hardware requirements, this chapter lays the base for the subsequent phases of development. 
+In fourth chapter, our project's architecture and design is presented in Chapter 4. Through use case diagrams, activity diagrams, data flow diagrams, and sequence diagrams, we present a comprehensive analysis, providing a solid foundation for the project's implementation. 
+The fifth chapter delves into the practical aspect of our project, detailing the development process from coding to integration. It showcases how the theoretical concepts from the 
+5 
+previous chapters are translated into a functional application through programming and software development practices. 
+The sixth chapter presents the outcomes of our project, including the results of testing, analysis of data, and validation of the system's functionality. It discusses how the implemented system performs against predefined criteria, identifies any shortcomings, and analyzes the data collected during testing to draw meaningful conclusions. 
+In the seventh chapter, we summarize the key findings of our project and discuss its implications. We reflect on the achievements and limitations, reiterate the project's objectives, and provide recommendations for future research and improvements. Additionally, we outline potential avenues for extending the project's functionality and addressing any unresolved 
+issues. 
+6 
+CHAPTER 2 
+BACKGROUND AND EXISTING WORK 
+Traditionally, therapists helped people with speech difficulties using hands-on techniques, focusing on exercises to control speech muscles. These were like special workouts to make talking easier. With technology getting smarter, there are new gadgets using learning tricks to help, but they struggle to sound natural and handle all speech challenges in real-time. 
+Recent tech advances brought in devices using machine learning to assist with speech issues. However, they face challenges in providing immediate and natural-sounding support for different ways people speak. Our project aims to bridge this gap by combining the wisdom of traditional speech therapy with the latest machine learning tricks. It's like mixing the best from the past with the coolest tech now. 
+Building on what others have done, our project sets out to create a system that not only understands and adjusts to challenging speech but also makes talking feel more natural and special for each person. Our goal is to address the changing needs in helping people with speech difficulties, making communication a smoother and more personalized experience for those with dysarthria. 
+2.1. Literature Review 
+The study in [1] by Goudar, Swain, and Naik presents a novel dysarthria recognition and speech reconstruction system, enhancing communication for individuals with dysarthria through advanced speech recognition and reconstruction technologies. 
+In [2], Dinh, Nguyen, and Park introduce a deep learning-based dysarthria voice reconstruction system using transfer learning. This system improves speech intelligibility for dysarthric patients by fine-tuning pre-trained models, making it effective even with limited dysarthric data. 
+The work in [3] by Aihara, Takiguchi, and Ariki focuses on phoneme-discriminative features for dysarthric speech conversion. Their research enhances speech recognition by developing features tailored to the phonetic characteristics of dysarthric speech, improving conversion 
+accuracy. 
+Chen et al. in [4] develop a joint-feature learning-based voice conversion system for dysarthric users. Utilizing deep learning, this system adapts to the vocal characteristics of dysarthric speech, resulting in clearer communication. 
+8 
+Yang and Chung in [5] use cycle-consistent adversarial training to improve the intelligibility of dysarthric speech. Their approach enhances clarity while maintaining naturalness. 
+VocaliD, as discussed in [6], creates personalized voices for individuals with speech impairments, allowing users to generate voices that reflect their identity. This innovation empowers users to communicate more naturally. 
+In [7]. Acapela Group's "My-own-voice" service provides personalized synthetic voices for individuals with speech challenges. This service enables users to create voices that resemble their own, enhancing communication and identity retention. 
+Shor et al. in [8] focus on personalizing automatic speech recognition (ASR) for dysarthric and accented speech with limited data. Their machine learning techniques improve ASR performance for users with speech impairments, making voice technology more accessible. 
+Enderby's review in [9] explores dysarthria and its communication challenges, offering insights into the complexities of the disorder and emphasizing the need for targeted interventions to improve communication. 
+Finally, Fu et al. in [10] apply joint dictionary learning-based non-negative matrix factorization for voice conversion, improving speech intelligibility after oral surgery. Their work demonstrates the potential of signal processing in speech rehabilitation. 
+2.2. Key Domain Constructs 
+Key domain constructs are the essential ideas or elements related to dysarthria, voice reconstruction, and the technology (like machine learning) crucial for our project. They are the building blocks that help define and understand the core aspects of our project's focus. Following are some key domain constructs: 
+2.2.1. Speech-to-Text (STT) Conversion 
+The process of converting dysarthric speech into written text, capturing the spoken content for further analysis and synthesis. 
+2.2.2. Text-to-Speech (TTS) Synthesis 
+The generation of machine-generated voice from the transcribed text, aiming to produce clear and natural-sounding speech. 
+9 
+2.2.3. Feature Analysis 
+Examination of acoustic features in dysarthric speech, potentially including formant frequencies, pitch, and other characteristics crucial for reconstructing speech. 
+2.2.4. Adaptive Learning 
+Incorporating mechanisms or algorithms that adapt to individual variations in dysarthric speech patterns, allowing the system to improve its performance over time. 
+2.2.5. User Interface (UI) 
+Design elements that facilitate user interaction, such as uploading audio files, 
+entering text manually, or providing real-time speech input. 
+2.3. Existing Systems 
+Table 2.1 shows the background of our Dysarthria Voice Reconstruction project stems from the recognition of the challenges faced by individuals with dysarthria, a motor speech disorder affecting the clarity of speech. Traditional assistive technologies have made significant progress in addressing these challenges, but there exists a need for more advanced and user-friendly solutions. Our project is motivated by the desire to leverage voice reconstruction algorithms to significantly improve speech intelligibility for individuals with dysarthria. We are offering a specialized software application that enhances users' 
+communication experience. 
+Currently, there are existing systems for dysarthria voice reconstruction like VocaliD and My- own-voice. But these systems clone the voice of a person and use text-to-speech method. However, it's important to note that these systems are still being developed and refined, and may not be available or appropriate for everyone with dysarthria. 
+Table 2.1: Summary of the Existing Systems/ Work/ App 
+Article No/APP/ System Year 
+VocaliD 
+Features 
+Strengths 
+Limitations 
+2014 
+It uses a database of 
+thousands of voice 
+strength 
+of Cost, 
+Time, 
+recordings to create 
+unique synthetic 
+voices that closely 
+VocaliD is its Accuracy, 
+versatility and Limited 
+flexibility. The Database, 
+technology can Maintenance. 
+10 
+match the person's be used in a 
+original voice. 
+variety 
+of 
+applications, 
+such as creating 
+synthetic voices 
+for individuals 
+with conditions 
+that 
+affect 
+My-Own-Voice 
+2015 
+It uses a database of 
+voice recordings to 
+speech. 
+It can be used Cost, Time, 
+with various Accuracy, 
+create a synthetic devices and Limited 
+voice that matches software, such Database, 
+the 
+individual's as 
+text-to- 
+unique 
+voice speech 
+characteristics. 
+programs. It is 
+also versatile 
+Maintenance. 
+10.1109/TENSYMP52854 2021 
+.2021.9550969 
+This study looks at 
+how words sound 
+Maryam E. Sabaee, 
+different for people 
+with voice issues 
+how 
+and adaptable to 
+different 
+languages and 
+accents. 
+They found big 
+differences in 
+The 
+these everyone 
+study 
+might not fit 
+words are said 
+because they 
+Hamid 
+Sharifzadeh 
+(2021). 
+after 
+compared to those voice issues 
+surgery by people with 
+only checked a 
+small group 
+without. 
+after surgery 
+compared 
+to 
+healthy people. 
+11 
+10.1109/CASSP43922.20 2022 
+22.9746680 
+The 
+research ASA improves 
+introduces 
+Dysarthric 
+ASA's promise 
+adversarial speaker 
+Speech 
+in 
+dysarthric 
+Disong Wang, Songxiang Liu, Xixin Wu (2022). 
+adaptation (ASA) to 
+Reconstruction 
+speech 
+enhance Dysarthric by making the 
+reconstruction 
+Speech 
+speaker sound 
+warrants 
+Reconstruction 
+more natural, 
+refinement for 
+(DSR) 
+by preserving 
+broader 
+preserving speaker identity details, 
+effectiveness 
+identity 
+while and reducing 
+across various 
+improving speech errors for those 
+speech patterns 
+quality. 
+with dysarthria. 
+and speaker 
+profiles. 
+2.4. Comparison of Existing Systems 
+Our project, which converts dysarthric speech to text and generates machine voices, 
+has broader goals than the adversarial speaker adaptation (ASA) approach. ASA primarily 
+focuses on preserving speaker identity in dysarthric speech reconstruction, while our project 
+addresses both speech-to-text conversion and voice generation. VocaliD and My-Own-Voice 
+focus on personalized synthetic voices and voice cloning, with less emphasis on the specifics of dysarthric speech. Our project covers a wider scope, tackling both text conversion and voice generation, while ASA centers on identity preservation during speech reconstruction. 
+2.5. Summary 
+Chapter 2 reviews traditional speech therapy methods and new technologies in addressing speech disorders. It highlights the limitations in achieving natural-sounding speech. The chapter introduces our project, which combines traditional speech therapy with machine learning to enhance speech recognition and production. It covers key concepts like speech-to-text conversion and voice synthesis, comparing existing systems like VocaliD and My-Own-Voice, noting their strengths and limitations. Our project aims to improve dysarthric speech conversion and machine-generated voices for better communication. 
+12 
+CHAPTER 3 
+SYSTEM REQUIREMENT & 
+SPECIFICATIONS 
+In the Dysarthria Voice Reconstruction project, it's important to outline exactly what our system should do. We're creating a system to aid people with speaking difficulties, and having a clear understanding of its capabilities is essential for development. 
+To ensure our system genuinely supports those with speaking challenges, we're closely collaborating with them and consulting speech experts. Their insights guide us in defining what our system needs to accomplish. It's like preparing a detailed plan to build something beneficial, and these specifications serve as our guiding principles. 
+With a well-defined set of requirements, we stay on track to create a system that genuinely addresses the needs of individuals with speaking difficulties. These specifications act as our roadmap, guiding us as we develop a system that aims to be truly helpful for this community. 
+3.1. Interface Requirements 
+Interface requirements specify how different parts of our app interact. For instance, our app needs a user-friendly interface, where users can easily record their speech and view the converted text. It also seamlessly integrates with external services like Whisper OpenAI and Google Voice for smooth speech-to-text and text-to-speech conversions. 
+3.1.1. Hardware Interface Requirements 
+Our project requires a robust hardware interface to ensure optimal performance. 
+The system must feature a multi-core processor to handle concurrent processes 
+efficiently and a minimum of 8 GB RAM to manage large datasets and complex 
+computations. SSD storage is necessary for faster data access and improved system 
+responsiveness. Additionally, a high-quality microphone is essential for accurate voice input during testing and development. Finally, a stable internet connection is required 
+to access external libraries and resources seamlessly. 
+3.1.2. Software Interface Requirements 
+The software interface requirements for our project encompasses several key components. We need an operating system such as Windows 10 or Android. The development environment will include Python for coding and scripting, along with Jupyter Notebook for interactive development. For machine and deep learning tasks, libraries and frameworks like TensorFlow or PyTorch are essential. Microsoft Office 
+14 
+will be used for creating project documentation. Additionally, Android Studio, with support for Flutter, will be utilized for UI design. 
+3.1.3. Online Interface Requirements 
+The online interface for our project should be designed as a simple and user- friendly website, enabling easy navigation and access to necessary information. It should be accessible from any internet-connected mobile device, ensuring convenience 
+for all users. The buttons and icons should be clear and intuitive, similar to those on a smartphone, allowing users to perform various actions effortlessly. Additionally, the system should display friendly messages in case of errors or when users require 
+assistance, providing a reassuring and supportive experience. 
+3.1.4. User Interface (UI) Requirements 
+The system's design should be simple and clear, akin to using an intuitive app, making it easy for users to understand and navigate. Text and colors on the screen should be chosen for high visibility and readability, much like reading a book with clear text. Since the system involves recording voices, the controls should be straightforward, with easy-to-use buttons for starting and stopping recordings, similar to a voice recorder. In case of errors or if users need assistance, the system should display helpful messages on the screen, providing clear guidance and reassurance, similar to common error messages like "Oops, something went wrong". 
+3.1.5. Software Tools and Technologies 
+The system will utilize several key technologies to enhance its functionality. Speech recognition software will enable the system to understand and recognize spoken words, similar to how a smartphone interprets voice commands. Text-to-speech technology will allow the system to convert written text into spoken words, providing a seamless audio output. Machine learning libraries will be integrated to enable the system to learn and improve its performance over time. The system will primarily use programming languages like Python to execute tasks and functions efficiently. Additionally, secure data storage will be implemented to safeguard the system's information, ensuring data security and reliability. 
+15 
+3.2. Functional Requirements 
+include: 
+Functional requirements for a Dysarthria Voice Reconstruction project typically 
+3.2.1. Dysarthric Voice Detection Module 
+The system should listen to sound and figure out signs that show someone has difficulty speaking because of dysarthria. It must differentiate between normal and dysarthric voice patterns with a high level of accuracy. 
+3.2.2. Voice-to-Text Conversion Module 
+The system should transcribe detected dysarthric speech into accurate textual representations. 
+3.2.3. Text-to-Voice Reconstruction Module 
+The system should convert transcribed text into a natural and intelligible voice 
+(Google and machine voice). 
+3.2.4. User-Friendly Interface 
+Development of a user-friendly interface to ensure accessibility for users with 
+varying levels of technological proficiency. 
+3.2.5. Compatibility 
+Compatibility with different devices and platforms to maximize accessibility 
+and usability. 
+3.3. Use Case Model 
+Figure 3.1 outlines the interactions between users and the system, detailing specific tasks that users perform and how the system responds to each action. This diagram serves as a blueprint for designing and testing software systems, illustrating the flow of information and user commands throughout the system's architecture. It highlights key functionalities, user inputs, and system outputs, providing a clear and comprehensive overview of the system's operation. By visualizing these interactions, Figure 3.1 aids in identifying potential areas for improvement, ensuring a user-friendly and efficient interface, and facilitating the development of robust and reliable software solutions. 
+16 
+Voice User 
+Provides Feedback 
+Initiates 
+Dysarthria Voice Reconstruction System 
+Continuous Model improvement 
+Improve 
+User Interaction with Al Mode! 
+Record Dysarthric Voice 
+Interacts with Al Model 
+Detect Dysarthric Voice 
+Convert 
+Convert Dysarthric Voice to Text 
+Convert 
+Convert Text to Machine Voice 
+Analyze 
+Figure 3.1: Use Case Model 
+오 
+Admin 
+Manages 
+3.4. Use Cases 
+Following are the use cases of our proposed system: 
+3.4.1. Generate Clear Speech 
+The user with dysarthria interacts with the system to convert their speech into 
+clearer, more understandable output. 
+3.4.2. Input Dysarthric Speech 
+The user provides their speech samples or input to the system for analysis and 
+reconstruction. 
+3.4.3. Speech Recognition 
+The system processes the dysarthric speech input and converts it into text for 
+further analysis. 
+17 
+3.4.4. Feature Extraction 
+Using VGGish or similar techniques, the system extracts relevant features from the speech input for identification and classification. 
+3.4.5. Detect Dysarthric Speech 
+Based on extracted features, the system determines whether the input speech is dysarthric or not. 
+3.4.6. Convert Text to Machine Voice 
+After identifying dysarthric speech, the system converts the recognized text into 
+a machine-generated voice for clearer output. 
+3.5. Non-Functional Requirements 
+Non-functional requirements for a Dysarthria Voice Reconstruction project typically include aspects related to system performance, usability, security, and other quality attributes. 
+The prominent non-functional requirements of our proposed system include: 
+• 
+Accuracy: The system must achieve a minimum accuracy rate of 85-90% in 
+detecting dysarthric voice. 
+Performance: The system should respond to user input within a specified time 
+frame to ensure real-time interaction and a seamless user experience. 
+Usability: The user interface should be intuitive and easy to navigate, catering to 
+users with varying levels of technological proficiency. 
+Reliability: The system should be reliable, with minimal downtime and robust 
+error-handling mechanisms. 
+Scalability: The solution should be scalable to accommodate potential increases 
+in user base or data volume. 
+Compatibility: The system should be compatible with various devices, 
+operating systems, and browsers for widespread accessibility. 
+Security: Implementation of security measures to protect user data, ensuring confidentiality, integrity, and availability. 
+18 
+Privacy: Compliance with privacy regulations and standards to safeguard user privacy and data. 
+Maintainability: The system should be designed and documented in a way 
+facilitates easy maintenance, updates, and enhancements. 
+that 
+These non-functional requirements are essential to ensure that the Dysarthria Voice Reconstruction project not only meets the functional needs of users but also adheres to high standards of performance, security, and user experience. 
+3.6. Resource's Requirements 
+Resources required for developing an application for dysarthric patients include both tangible and intangible resources. Here are some potential resource requirements for the 
+project: 
+3.6.1. Hardware Resources 
+The project requires robust computing infrastructure, including powerful servers or cloud computing resources, to efficiently handle speech processing and reconstruction algorithms. Additionally, various testing devices, such as computers, tablets, and smartphones, are essential for ensuring the system's compatibility and performance across different platforms and devices. 
+3.6.2. Software Resources 
+The project will utilize several key resources to achieve its goals. Machine learning libraries like TensorFlow or PyTorch will be essential for implementing VGGish and dysarthria detection algorithms. Text-to-speech synthesis tools will be employed to convert written text into machine-generated voices. Additionally, development environments such as Python IDEs will be used for coding and testing, providing the necessary support for effective development and debugging. 
+3.6.3. Data Resources 
+Access to the Torgo dataset or similar speech datasets suitable for training and 
+validation purposes. 
+19 
+3.6.4. Time Resources 
+A well-defined development timeline is crucial for managing the different phases of the project, including development, testing, and deployment. The project schedule should allocate specific time for regular testing, feedback collection, and system refinement to ensure the system is thoroughly evaluated and improved throughout its lifecycle. This structured approach will help in tracking progress, meeting deadlines, and achieving project milestones effectively. Ensuring that these resources are adequately allocated and managed is crucial for the successful development and deployment of the Dysarthria Voice Reconstruction project. 
+3.7. Project Feasibility 
+Feasibility study of the project is performed to analyze whether the project is feasible within the time and budget. 
+3.7.1. Technical Feasibility 
+Following points include in technical feasibility of our project: 
+• Dataset Suitability: Evaluate Torgo dataset diversity and volume for 
+robust model training. 
+• VGGish Implementation: Assess the suitability of VGGish for feature 
+extraction from speech data. 
+• Dysarthria Detection Reliability: Check the accuracy of dysarthria 
+detection algorithms. 
+• Text-to-Speech Quality: Evaluate the naturalness and adaptability of 
+machine-generated voices. 
+3.7.2. Operational Feasibility 
+Following points include in operational feasibility of our project: 
+• Integration: Ensure seamless integration of system components. 
+• Usability Testing: Assess the system's ease of use and accessibility. 
+3.7.3. Legal and Ethical Feasibility 
+Following points include in legal and ethical feasibility of our project: 
+20 
+Data Privacy Compliance: Make sure to follow the rules about keeping people's information private and safe. 
+• Accessibility Standards: Make sure the system is made in a way 
+3.8. Summary 
+easy for everyone to use and access. 
+that's 
+The chapter serves as a comprehensive guide for the development of the Dysarthria Voice Reconstruction system. It delineates essential features and functionalities, ensuring a user-friendly interface for individuals with speech challenges. The outlined hardware and software requirements provide a clear roadmap for seamless integration and operation. With a 
+focus on accessibility and inclusivity, the specifications address the unique needs of users. This 
+chapter underscores the significance of clear requirements in steering the development process, ultimately aiming to deliver a technologically advanced and empathetic solution that revolutionizes communication for those with dysarthria. 
+21 
+CHAPTER 4 
+SYSTEM MODELING & DESIGN 
+This chapter focuses on designing our Dysarthria Voice Reconstruction system, which is an essential of our project. It's like making a plan or a blueprint for building something important. We're designing how our system will work and how it will look and feel for the people using it, especially those with speech challenges like dysarthria. 
+organize 
+Designing the Dysarthria Voice Reconstruction system is really important because it helps us our ideas and make sure everything works smoothly. We'll talk about different parts of the design, like how the system will flow, what it will look like on the screen, and how people will interact with it. This chapter will show how we're putting all these pieces together to create a system that's easy to use and helpful for people with dysarthria. 
+Moreover, in this chapter, we'll also provide detailed insights into the process flow of our project, the development view, and the physical view of the system. Additionally, we'll explore the design of use cases, activity diagrams, and the flow of data, including the sequence of the data flow. By examining these aspects, we aim to create a comprehensive design framework that ensures the effectiveness and usability of the proposed system. 
+4.1. System Design and Analysis 
+In developing the Dysarthria Voice Reconstruction system, we focus on assessing and 
+designing the machine that will empower individuals with speech challenges. Our approach 
+involves using various design elements such as use case diagrams, sequence diagrams, and 
+data flow diagrams. Each of these diagrams serves as a unique perspective, allowing us to 
+understand our machine's interactions, information processing, and behavior. 
+Consider use case diagrams as the script for our system's play, illustrating how users and the system will engage. Meanwhile, data flow diagrams showcase the flow of information within our machine. Cautionary information and flow diagrams act as navigational signs, guiding us 
+on how the system communicates and behaves. 
+4.2. Design Approach 
+In crafting the Dysarthria Voice Reconstruction system, we have adopted a design approach that aligns with the principles of "Top-Down Design". This means we started by envisioning the system as a whole and then progressively broke it down into smaller, more manageable components. 
+23 
+In applying the Top-Down Design Approach to our Dysarthria Voice Reconstruction project, we started by outlining the overarching goals and functionalities of the system. We defined the main objective: creating a voice reconstruction system for individuals with dysarthria. This high-level vision guided the entire project. 
+Breaking it down further, we identified the key components needed to achieve our goal. This involved defining modules such as voice analysis, machine learning algorithms, text generation, and natural-sounding voice synthesis. Each of these components played a crucial role in the overall system. 
+As we moved forward, we delved into more detail for each module. For instance, in the voice analysis module, we outlined the specific features to be analyzed and the algorithms to be employed. In the machine learning module, we detailed how the system would learn and adapt to individual speech patterns. 
+This step-by-step breakdown allowed us to maintain a clear focus on the big picture while ensuring that every smaller component contributed effectively to the overall success of the Dysarthria Voice Reconstruction system. 
+4.3. Interface Design 
+Figure 4.1 refers to how the different parts of our app look and work together. It involves creating a user-friendly layout, clear buttons for actions like recording speech, and easy-to-read text displays for converted speech. Good interface design ensures users can navigate the app easily and understand how to use its features effectively. 
+4.3.1. Input Methods 
+The system should support multiple input methods to enhance flexibility and user convenience. This includes accepting real-time speech input, allowing users to interact with the system via voice commands or dictation. 
+4.3.2. Output Display 
+The output display should be designed to present results, progress, and instructions in a clear and comprehensive manner. It should include visual representations of data, such as graphs or charts, where applicable, to aid user 
+understanding. 
+24 
+Assist Dysarthria 
+Choose Audio File 
+Tap to Record 
+Translation 
+Your Data From API 
+Speaker 
+Figure 4.1: Interface Design 
+4.4. View Model of Architecture 
+The View Model of Architecture refers to how different aspects of the system are visually represented and organized for better understanding and communication. For example, 
+User interface view, system architecture view, Data flow view, these views help stakeholders, 
+developers, and other team members grasp different aspects of the project, facilitating effective 
+communication and decision-making throughout the development process. 
+4.4.1. Process View 
+Figure 4.2 shows that at runtime, the system operates through several stages: feature extraction, dysarthria detection, text conversion, and machine voice synthesis. 
+1. Feature Extraction Stage 
+In this phase, the VGGish component captures audio features from the provided dysarthric speech samples. 
+• The extracted features are then forwarded to the Dysarthria Detection 
+Algorithm for dysarthria assessment. 
+25 
+2. Dysarthria Detection Stage 
+• 
+The Dysarthria Detection Algorithm processes the extracted features to identify dysarthric speech patterns. 
+Based on the analysis, it generates dysarthria status or classification, indicating whether the speech is dysarthric or not. 
+3. Text Conversion Stage 
+• Upon identifying dysarthric speech, the system passes the audio to the Speech-to-Text component. 
+• The Speech-to-Text System translates the dysarthric speech into textual representation for further processing. 
+4. Machine Voice Synthesis Stage 
+The generated text undergoes processing in the Text-to-Speech System for converting it into a machine-generated voice. 
+• The resulting machine voice output is delivered back to the user or as the final output of the system. 
+Processes 
+«Orange- Voice Feature Extraction 
+a 
+• Orange 
+Text Conversion 
+Voice Input Processing 
+Speech-to-Text Conversion 
+SpeechRecognitionSystem 
+TextToSpeechSystem 
+Extracts Voice Features 
+(Converts Text to Clear Speech 
+C 
+Provides Voice Input 
+Feature Extraction 
+Text-to-Speech Conversion 
+User 
+interacts with App 
+MoblieAppUser 
+Provides Clear Speech Output Analyzes Voice Features 
+-Orange- Dysarthria Detection 
+Feature Analysis 
+Dysarthia Detection 
+Detects Dysarthric Voice 
+DysarthriaDetectionSub 
+Figure 4.2: Process view 
+Converts Dysarthric voice to Text 
+26 
+4.4.2. Development View 
+The development view in Figure 4.3 shows that software architecture is all about breaking down the system's structure into manageable parts, modules, components, or building blocks and illustrating their relationships and interactions. It's like looking at the blueprint of a building before it's constructed, detailing how different parts fit together and function. 
+User 
+Interacts with 
+Application Server 
+Application Server 
+Stores data in 
+Database 
+Uses 
+Google Voice API 
+4.4.3. Physical View 
+Figure 4.3: Development View 
+The physical view in Figure 4.4 provides a comprehensive overview of the 
+system's physical or deployment architecture, illustrating how software components are 
+distributed across the hardware infrastructure. This view details the specific hardware 
+elements, such as servers, network devices, and storage systems, that host the software 
+components and outlines their physical connections and data flow. It covers critical aspects like system distribution, highlighting how different components communicate across various network topologies. The view also addresses deployment strategies, explaining the arrangement of components for optimal performance, reliability, and maintainability. 
+27 
+Physical View 
+Smartphone/Tablet 
+Audio Input Audio Output 
+Data Transmission 
+Microphone 
+Speaker/ Headphones 
+Internet Connection 
+Figure 4.4: Physical View 
+4.4.4. Logical View 
+In the logical view of system modeling, we focus on the class diagram in Figure 4.5, a static structure diagram that illustrates the system's classes, their attributes, methods, and interrelationships. This diagram is crucial for object-oriented design, detailing the core components of our speech impairment detection application. 
+Key classes include User, Mobile App, Server, VGGish-Model, Detection Model, Text-To-Speech, Audio, and Features. The User interacts with the Mobile App, which communicates with the Server. The Server processes voice data through the VGGishModel for feature extraction and the Detection Model for classification. 
+Finally, Text-To-Speech converts the results into synthesized speech. This structure 
+ensures efficient data flow and interaction within the system. 
+The Server class serves as the central processor, managing data flow between system 
+components. It receives voice data from the mobile app, coordinates processing using 
+the VGGish-Model for feature extraction, and passes extracted features to the Detection 
+Model for classifying speech impairments. The Text-To-Speech class converts text results into synthesized speech, making outputs user-friendly. 
+This logical structure ensures efficient data flow and interaction within the system. The diagram not only delineates the roles and responsibilities of each class but also clarifies the relationships and dependencies among them. 
+28 
+User 
+o userID: String 
+o name: String 
+⚫ uploadVoice(): void 
+⚫ getResult(): void 
+Uses 
+MobileApp 
+◇ appID: String 
+⚫ user: User 
+o server: Server 
+• uploadVoice(): vold 
+⚫ displayResult(): void 
+communicates 
+Server 
+o serverID: String 
+• processVoice Data(voice Data: Audio): void 
+⚫ returnClassificationResult(): String 
+processes 
+1 
+classifies 
+converts 
+⚫ modellD: String 
+VGGishModel 
+⚫ extractFeatures(voiceData: Audio): Features 
+CDetectionModel 
+c modellD: String 
+classifyFeatures(features: Features): String 
+ottsID: String 
+TextToSpeech 
+• convertTextToVoice(text: String): Audio 
+1 
+extracts 
+Features 
+o featurel D: String 
+o data: Float[] 
+uses 
+1 
+generates 
+Audio 
+⚫ audiol D: String 。 data: Byte[] 
+Figure 4.5: Class diagram 
+4.5. Main Use Case Diagram 
+Figure 4.6 illustrates the key interactions between users and the system, providing a visual representation of the primary tasks or actions users can perform. It details how users engage with various system components, outlining the sequence of actions and responses. This diagram highlights user inputs, such as voice commands or data uploads, and the corresponding system outputs, including real-time feedback, processed results, or synthesized speech. By mapping out these interactions, Figure 4.6 clarifies the system's overall functionality and user flow, offering a comprehensive overview of the user experience. It serves as a crucial tool for understanding how the system meets user needs and requirements, aiding in the design and refinement of the user interface and system architecture. 
+29 
+Admin 
+Dysarthria Voice Reconstruction 
+Voice Recording 
+Analyse... 
+Detect 
+Dysarthria Voice 
+Al Interaction 
+Actor 
+Convert 
+Voice into Text 
+Getting Output 
+Manages- 
+Convert 
+4.6. Full Dress Use Case 
+Figure 4.6: Use Case Diagram 
+The full-dress use case describes how the app is used in a real-life scenario. It includes steps like opening the app, recording speech, converting it to text, and listening to the converted speech. This helps understand how the app functions from start to finish in practical situations. 
+4.6.1. Full Dress Use Case 1 
+Table 4.1 details Use Case 01, "Convert Dysarthric Speech to Text," where a patient initiates the speech-to-text conversion process. Upon activation, the system captures the patient's dysarthric speech and processes it using advanced algorithms designed to handle speech impairments. The system then generates the corresponding 
+text output, accurately transcribing the spoken words into readable text. This use case 
+is pivotal for individuals with dysarthria, as it provides a reliable means of converting 
+impaired speech into clear, written communication. The process not only facilitates 
+immediate communication but also enables further use or analysis of the text, such as 
+for medical assessments, documentation, or data collection for research purposes. The successful execution of this use case is crucial for ensuring that the system meets its objective of assisting patients with speech impairments. 
+30 
+Use case id; 
+Use case name: 
+Actor: 
+Table 4.1: Speech to Text - Full Dress Use Case 
+01 
+Convert Dysarthric Speech to Text 
+Patient 
+Pre-conditions: 
+Main flow: 
+User has initiated the speech-to-text conversion 
+process. 
+Post-conditions: 
+User initiates speech-to-text conversion. 
+Dysarthric speech is processed, and text is 
+generated. 
+Text is generated from the dysarthric speech 
+4.6.2. Full Dress Use Case 2 
+Table 4.2 shows Use Case 02, "Analyze Acoustic Features," is triggered once the dysarthric speech-to-text conversion is completed. In this use case, the system analyzes the acoustic features of the dysarthric speech, focusing on attributes like formant frequencies. The analysis aims to extract these key acoustic features to understand and characterize the speech patterns better. This information is crucial for further processing or diagnostic purposes. 
+Table 4.2: Analyze Acoustic features - Full Dress Use Case 
+Use case id: 
+Use case name: 
+Actor: 
+02 
+Analyze Acoustic Features 
+System 
+31 
+Pre-conditions: 
+Main flow: 
+Post-conditions: 
+Dysarthric speech-to-text 
+conversion is 
+completed 
+System analyzes acoustic features of dysarthric speech.. 
+Acoustic features, such as formant frequencies, are extracted 
+4.6.3. Full Dress Use Case 3 
+Table 4.3 shows Use Case 03, "Synthesize Machine Voice," involves the system synthesizing a machine-generated voice from available text derived from dysarthric speech. Once the text is ready, the system processes it to produce a synthetic voice output. This use case ensures that the converted text is effectively transformed into audible speech, providing a clear and understandable machine-generated voice. The end result is a synthesized voice that mirrors the original text content. 
+Table 4.3: Synthesize Machine Voice - Full Dress Use Case 
+Use case id: 
+03 
+Use case name: 
+Actor: 
+Pre-conditions: 
+Main flow: 
+Post-conditions: 
+Synthesize Machine Voice 
+System 
+Text from dysarthric speech is available for 
+synthesis 
+System synthesizes machine-generated voice 
+from the converted text. 
+Machine-generated voice is produced from the synthesized text 
+32 
+4.6.4. Full Dress Use Case 4 
+Table 4.4 shows Use Case 04, "Preserve Speaker Identity," involves the system applying techniques to retain the speaker's unique characteristics in the machine- generated voice after speech synthesis is completed. The system ensures that the synthesized voice reflects the speaker's identity, maintaining distinguishing features like tone and accent. This process helps make the synthetic speech sound more natural and recognizable, preserving the individuality of the original speaker. 
+Use case id: 
+Use case name: 
+Actor: 
+Pre-conditions: 
+Main flow: 
+Post-conditions: 
+Table 4.4: Preserve Speaker Identity- Full Dress Use Case 
+04 
+Preserve Speaker Identity 
+System 
+Speech synthesis is completed 
+System applies techniques to maintain the speaker's identity during speech synthesis. 
+Speaker's identity is preserved in the machine- 
+generated voice 
+4.6.5. Full Dress Use Case 5 
+Table 4.5 shows Use Case 05, "User Interface Interaction," involves the system managing the interaction between users and the interface after speech synthesis is completed. The system facilitates user input and feedback through the interface, 
+ensuring smooth operation and responsiveness. This use case ensures that users can easily interact with the system, make adjustments, and receive accurate outputs based 
+on their inputs, enhancing overall user experience. 
+33 
+Use case id: 
+Use case name: 
+Actor: 
+Pre-conditions: 
+Main flow: 
+Post-conditions: 
+Table 4.5: User Interface Interaction - Full Dress Use Case 
+05 
+User Interface Interaction 
+System 
+Speech synthesis is completed 
+System applies techniques to maintain the speaker's identity during speech synthesis. 
+Speaker's identity is preserved in the machine-generated voice 
+4.7. Activity Diagram 
+Figure 4.7 outlines the flow of activities from user input through system processes. It includes key steps like speech recognition, text-to-speech conversion, and algorithm execution, along with decision points and transitions between different states. The diagram also illustrates feedback loops for system refinement and user interaction, providing a clear overview of the project's functional workflow. 
+The diagram also details the execution of algorithms, such as machine learning models used for feature extraction, speech classification, and synthesis. It highlights critical decision points where the system determines the next steps based on the processed data, such as whether the 
+input is valid or if additional data is needed. 
+Transitions between different states, such as moving from data processing to output generation, are clearly illustrated. The diagram also includes feedback loops, essential for refining system performance. These loops allow the system to learn from user interactions, improving accuracy and efficiency over time. Additionally, Figure 4.7 showcases the interaction between system components and the user interface, providing a holistic view of the project's functional 
+workflow. 
+34 
+User Records Dysarthric Voice 
+Extract Features using VGGish 
+Train Al Model 
+Detect Dysarthric Voice 
+Yes 
+is Dysarthnc> 
+no 
+Convert Dysarthric Voice to Text 
+End 
+Convert Text to Machine Voice 
+Output Machine Voice 
+4.8. Data Flow Diagram 
+Figure 4.7: Activity Diagram 
+Figure 4.8 and 4.9 provides information about the input and output of each entity and approach. It illustrates how statistics are sent from one module to the next. Using facts go together with the float diagram, a person or developer can understand how any system begins off evolved off created to paintings in order. It essentially shows how data objects are changed as they go through the system. The machine's consumption, approach, and output are depicted 
+in the statistics float diagram. 
+It also assists in the description of the connection between various additives. The data flow diagram for our project is shown figure. The data flow diagrams also help identify critical points where data validation, error handling, or decision-making occurs, ensuring the system's robustness and reliability. By providing a comprehensive view of the system's data flow, these figures serve as essential tools for understanding, designing, and optimizing the system's architecture and functionality. They offer valuable insights into how data is managed, manipulated, and utilized, ultimately leading to a more efficient and effective system. 
+35 
+For LEVEL 0 
+User 
+User 
+For LEVEL 1 
+Recorder 
+dysarthric voice 
+Convert into text and 
+ΑΙ 
+voice 
+Model 
+Display Output 
+Figure 4.8: DFD Level 0 
+User 
+1.0 
+Input audio 
+6.0 
+2.0 
+Detection 
+5.0 
+Convert into Machine Voice 
+Convet into Text 
+4.0 
+Dysarthnic Voice 
+3.0 
+Database 
+Normal Voice 
+User 
+Figure 4.9: DFD Level 1 
+4.9. System Sequence Diagram 
+For 
+every use case, figure 4.10 specifies the character situation. It connects a lot of 
+people, including the user, the device, and its components. Within the device collection diagram, In the proposed system may pass over every use case intensive, which includes how the user interacts with the system. It's far more challenging than using a case diagram. It describes the user's interaction with the gadget in a chronological order. The horizontal lines 
+36 
+in this image illustrate the interaction of gadgets, while the dotted line denotes that both the person and the device are engaged inside the diagram. The system sequence diagram is: 
+Mobile App Speech Recognition 
+User 
+initiates text-to-speech conversion 
+Feature Extraction 
+Sends voice input 
+Dysarthria Detection 
+Text-to-Speech 
+Extracts features 
+Receives clear speech output 
+Provides clear speech output 
+Detects dysarthria 
+Returns dysarthric voice Converts text to clear speech 
+User 
+C 
+Mobile App Speech Recognition Feature Extraction 
+Dysarthria Detection 
+Text-to-Speech 
+Figure 4.10: System Sequence diagram 
+4.10. Sequence Diagram 
+Figure 4.11 depicts the interaction flow between components in the project. It starts with the user action, such as providing voice input, and follows the process through speech recognition, text-to-speech conversion, and any machine learning algorithms. It shows how data moves between the user interface, processing units, and outputs, detailing system responses and error handling in a clear, step-by-step sequence. 
+OK 
+User 
+• 
+Mobile App 
+Upload Voice 
+Send Voice Data 
+Server 
+VGGish Model Detection Model 
+Process Voice Data 
+Return Features 
+Extract Features 
+Classify Features 
+Analyze Features 
+Return Classification Result 
+Send Classification Result 
+Display Result 
+User 
+Mobile App 
+Server 
+VGGish Model 
+Detection Model 
+Figure 4.11: Sequence diagram 
+37 
+4.11. Summary 
+This chapter focuses on how we designed our Dysarthria Voice Reconstruction system. We thought carefully about how to make it helpful for people who have trouble speaking. We planned how users will interact with our system, making sure it's easy for them. We also drew diagrams to show how different parts of our system connect. These drawings help us understand how everything works together.
