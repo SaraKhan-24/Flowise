@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Miscellaneous
 *.class
 *.log
@@ -43,3 +44,25 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+=======
+# Python Environment & Cache
+**/bin/
+**/lib/
+**/lib64/
+**/include/
+**/pyvenv.cfg
+**/__pycache__/
+*.pyc
+leak_detector_env/
+
+# Sensitive Secrets (DO NOT REMOVE)
+.env
+secrets.h
+*.json
+!config.example.json
+
+# Flutter/Mobile
+mobile_app/.dart_tool/
+mobile_app/build/
+mobile_app/.packages
+>>>>>>> 2559bff91734eb14573729f21c74dc12aed47c2e
