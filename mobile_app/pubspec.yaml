@@ -1,0 +1,45 @@
+name: fyp
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  provider: ^6.1.1
+  http: ^1.2.0
+  local_auth: ^2.3.0
+  fl_chart: ^0.66.0
+
+  # Firebase Dependencies (Fixed Indentation)
+  firebase_core: ^2.32.0
+  firebase_database: ^10.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+# Icon Configuration
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/app_icon.jpeg"
+  image_ratio_android: 0.5
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon.jpeg"
+
+flutter:
+  uses-material-design: true
+
+  # Assets Registration
+  assets:
+    - assets/icon/

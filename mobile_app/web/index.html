@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <title>FloWise</title>
+  <style>
+    body { background-color: #0F172A; } /* Show a dark background immediately */
+  </style>
+</head>
+<body>
+  <script>
+    // Force the HTML renderer to avoid CanvasKit crashes
+    window.flutterWebRenderer = "html";
+    
+    // Clear old service workers that cause white screens
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) { registration.unregister(); }
+      });
+    }
+  </script>
+  <script src="main.dart.js" type="application/javascript"></script>
+</body>
+</html>
