@@ -6,6 +6,12 @@
 #include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
 #include "secrets.h"
+#include "time.h"
+
+// --- NTP CONFIGURATION ---
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 18000; // Pakistan is GMT+5 (5 * 3600)
+const int   daylightOffset_sec = 0; // No DST in Pakistan
 
 // ---------------- SENSORS ----------------
 const int F1_PIN = 18;
@@ -30,9 +36,9 @@ bool writeInProgress = false;
 
 const char* DEVICE_ID = "esp32_node_01";
 
-// Sensor data structure
+// Updated for Formatted Time
 struct SensorData {
-  uint32_t timestamp;
+  String timestamp; // Changed to String
   float p1_spu;
   float f1;
   float f2;
@@ -73,27 +79,23 @@ void connectWiFi() {
     Serial.print("WiFi OK. IP: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("WiFi failed (will retry in loop).");
+    Serial.println("WiFi failed.");
   }
 }
 
 void calibrateBaseline() {
-  Serial.println("Calibrating baseline... KEEP PUMP OFF FOR 3 SECONDS");
+  Serial.println("Calibrating baseline... KEEP PUMP OFF");
   delay(3000);
 
   uint32_t b1 = 0, b2 = 0;
   for (int i = 0; i < 250; i++) {
     b1 += analogRead(P1_PIN);
     b2 += analogRead(P2_PIN);
-    delay(5);  // Longer wait between samples
+    delay(5);
   }
 
   baseP1 = (b1 / 250.0f / 4095.0f) * 3.3f;
   baseP2 = (b2 / 250.0f / 4095.0f) * 3.3f;
-
-  Serial.print("Baseline P1="); Serial.print(baseP1, 4);
-  Serial.print(" V, P2=");      Serial.print(baseP2, 4);
-  Serial.println(" V");
 }
 
 void setup() {
@@ -105,8 +107,17 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(F2_PIN), count2, RISING);
 
   analogReadResolution(12);
-
   connectWiFi();
+
+  // Initialize and Wait for NTP Sync
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  Serial.print("Waiting for NTP time sync");
+  struct tm timeinfo;
+  while (!getLocalTime(&timeinfo)) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println("\n✅ Time Synced!");
 
   ssl_client.setInsecure();
   ssl_client.setConnectionTimeout(1000);
@@ -117,48 +128,31 @@ void setup() {
   Database.url(DATABASE_URL);
 
   calibrateBaseline();
-
-  Serial.println("✓ Ready! CSV order for ML:");
-  Serial.println("timestamp,P1_SPU,F1_Lmin,F2_Lmin,P2_SPU,Label");
 }
 
 void loop() {
   app.loop();
 
-  // Manual label from serial: send '1' for leak, '0' for normal
   if (Serial.available()) {
     char c = Serial.read();
-    if (c == '1') {
-      currentLabel = 1;
-      Serial.println("[LABEL] Changed to: LEAK (1)");
-    }
-    if (c == '0') {
-      currentLabel = 0;
-      Serial.println("[LABEL] Changed to: NORMAL (0)");
-    }
+    if (c == '1') currentLabel = 1;
+    if (c == '0') currentLabel = 0;
   }
 
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWiFi();
-  }
+  if (WiFi.status() != WL_CONNECTED) connectWiFi();
 
   uint32_t now = millis();
   if (now - prevMs < INTERVAL_MS) return;
   prevMs = now;
 
-  // Snapshot pulse counts atomically
   noInterrupts();
-  uint32_t p1Count = pulse1;
-  uint32_t p2Count = pulse2;
-  pulse1 = 0;
-  pulse2 = 0;
+  uint32_t p1Count = pulse1; uint32_t p2Count = pulse2;
+  pulse1 = 0; pulse2 = 0;
   interrupts();
 
-  // Flow (L/min)
   float f1 = p1Count / FLOW_CAL;
   float f2 = p2Count / FLOW_CAL;
 
-  // Pressure oversampling (30x)
   uint32_t p1raw = 0, p2raw = 0;
   for (int i = 0; i < 250; i++) {
     p1raw += analogRead(P1_PIN);
@@ -166,67 +160,57 @@ void loop() {
   }
   float v1 = (p1raw / 250.0f / 4095.0f) * 3.3f;
   float v2 = (p2raw / 250.0f / 4095.0f) * 3.3f;
-
   float p1_spu = (v1 - baseP1) * SPU_GAIN;
   float p2_spu = (v2 - baseP2) * SPU_GAIN;
-  
-  // Allow negative values - they show real pressure drift!
-  // (Removed clamping to 0)
 
-  // Local CSV print in exact ML order
-  uint32_t tSec = now / 1000;
-  Serial.print(tSec);         Serial.print(",");
+  // --- NEW FORMATTING LOGIC ---
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Time Error");
+    return;
+  }
+    // Create the human-readable version for the data value
+  char buf[25];
+  strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  String formattedTime = String(buf);
+
+  // Create a sanitized version for the Firebase PATH (Key)
+  // Example: "2026-05-04_22-57-07"
+  char pathBuf[25];
+  strftime(pathBuf, sizeof(pathBuf), "%Y-%m-%d_%H-%M-%S", &timeinfo);
+  String safePath = String(pathBuf);
+
+  // Serial Print
+  Serial.print(formattedTime); Serial.print(",");
   Serial.print(p1_spu, 3);    Serial.print(",");
   Serial.print(f1, 3);        Serial.print(",");
   Serial.print(f2, 3);        Serial.print(",");
   Serial.print(p2_spu, 3);    Serial.print(",");
   Serial.println(currentLabel);
 
-  // Store data for Firebase write
-  pendingData.timestamp = tSec;
-  pendingData.p1_spu = p1_spu;
-  pendingData.f1 = f1;
-  pendingData.f2 = f2;
-  pendingData.p2_spu = p2_spu;
-  pendingData.label = currentLabel;
+  pendingData = {formattedTime, p1_spu, f1, f2, p2_spu, currentLabel};
   hasPendingData = true;
 
-  // ========== ATTEMPT FIREBASE WRITE ==========
+  // --- UPDATED FIREBASE WRITE ---
   if (now - lastWriteTime >= WRITE_INTERVAL_MS && hasPendingData) {
-      String path = String("/sensor_readings/") + String((int)pendingData.timestamp);
+      String path = String("/sensor_readings/") + safePath;
 
-      // Write all fields
-      Database.set<int>(aClient, (path + "/timestamp").c_str(), (int)pendingData.timestamp, nullptr, "writeTask");
+      Database.set<String>(aClient, (path + "/timestamp").c_str(), formattedTime, nullptr, "writeTask");
       Database.set<float>(aClient, (path + "/p1_spu").c_str(), pendingData.p1_spu, nullptr, "writeTask");
       Database.set<float>(aClient, (path + "/f1_lmin").c_str(), pendingData.f1, nullptr, "writeTask");
       Database.set<float>(aClient, (path + "/f2_lmin").c_str(), pendingData.f2, nullptr, "writeTask");
       Database.set<float>(aClient, (path + "/p2_spu").c_str(), pendingData.p2_spu, nullptr, "writeTask");
       Database.set<int>(aClient, (path + "/label").c_str(), pendingData.label, nullptr, "writeTask");
 
-      writeInProgress = true;
       lastWriteTime = now;
-      Serial.print("✅ Data sent. Timestamp: ");
-      Serial.println((int)pendingData.timestamp);
-      
       hasPendingData = false;
   }
 }
 
 void processData(AsyncResult &aResult) {
   if (!aResult.isResult()) return;
-
-  if (String(aResult.uid().c_str()) != "writeTask" && String(aResult.uid().c_str()) != "authTask") {
-    return;
-  }
-
   if (aResult.isError()) {
-    Serial.print("❌ Error [");
-    Serial.print(aResult.uid().c_str());
-    Serial.print("]: ");
+    Serial.print("❌ Error: ");
     Serial.println(aResult.error().message().c_str());
-  } else {
-    if (String(aResult.uid().c_str()) == "writeTask") {
-      writeInProgress = false;
-    }
   }
 }
