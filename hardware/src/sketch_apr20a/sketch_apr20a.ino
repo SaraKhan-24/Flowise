@@ -7,6 +7,7 @@
 #include <FirebaseClient.h>
 #include "secrets.h"
 #include "time.h"
+#include <FirebaseJson.h>
 
 // --- NTP CONFIGURATION ---
 const char* ntpServer = "pool.ntp.org";
@@ -26,8 +27,12 @@ const float SPU_GAIN = 370.0;
 // ---------------- STATE ----------------
 volatile uint32_t pulse1 = 0, pulse2 = 0;
 float baseP1 = 0.0, baseP2 = 0.0;
-int currentLabel = 0;
+const int DEFAULT_LABEL = 0;  // Always assume "Normal" until told otherwise
+int currentLabel = DEFAULT_LABEL;
 uint32_t prevMs = 0;
+
+object_t jsonData, obj1, obj2, obj3, obj4, obj5, obj6;
+JsonWriter writer;
 
 // Write flow control
 uint32_t lastWriteTime = 0;
@@ -129,14 +134,14 @@ void setup() {
 
   calibrateBaseline();
 }
-
 void loop() {
   app.loop();
 
+  // 1. Update label via Serial (Critical for Ground Truth)
   if (Serial.available()) {
     char c = Serial.read();
-    if (c == '1') currentLabel = 1;
-    if (c == '0') currentLabel = 0;
+    if (c == '1') { currentLabel = 1; Serial.println("🚨 STATE: LEAK"); }
+    if (c == '0') { currentLabel = 0; Serial.println("📊 STATE: NORMAL"); }
   }
 
   if (WiFi.status() != WL_CONNECTED) connectWiFi();
@@ -145,6 +150,7 @@ void loop() {
   if (now - prevMs < INTERVAL_MS) return;
   prevMs = now;
 
+  // 2. Sensor Sampling Logic
   noInterrupts();
   uint32_t p1Count = pulse1; uint32_t p2Count = pulse2;
   pulse1 = 0; pulse2 = 0;
@@ -158,26 +164,16 @@ void loop() {
     p1raw += analogRead(P1_PIN);
     p2raw += analogRead(P2_PIN);
   }
-  float v1 = (p1raw / 250.0f / 4095.0f) * 3.3f;
-  float v2 = (p2raw / 250.0f / 4095.0f) * 3.3f;
-  float p1_spu = (v1 - baseP1) * SPU_GAIN;
-  float p2_spu = (v2 - baseP2) * SPU_GAIN;
+  float p1_spu = ((p1raw / 250.0f / 4095.0f) * 3.3f - baseP1) * SPU_GAIN;
+  float p2_spu = ((p2raw / 250.0f / 4095.0f) * 3.3f - baseP2) * SPU_GAIN;
 
-  // --- NEW FORMATTING LOGIC ---
+  // 3. Time Formatting
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
-    Serial.println("Time Error");
-    return;
-  }
-    // Create the human-readable version for the data value
-  char buf[25];
+  if (!getLocalTime(&timeinfo)) return;
+  char buf[25], pathBuf[25];
   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &timeinfo);
-  String formattedTime = String(buf);
-
-  // Create a sanitized version for the Firebase PATH (Key)
-  // Example: "2026-05-04_22-57-07"
-  char pathBuf[25];
   strftime(pathBuf, sizeof(pathBuf), "%Y-%m-%d_%H-%M-%S", &timeinfo);
+  String formattedTime = String(buf);
   String safePath = String(pathBuf);
 
   // Serial Print
@@ -188,24 +184,122 @@ void loop() {
   Serial.print(p2_spu, 3);    Serial.print(",");
   Serial.println(currentLabel);
 
-  pendingData = {formattedTime, p1_spu, f1, f2, p2_spu, currentLabel};
-  hasPendingData = true;
-
-  // --- UPDATED FIREBASE WRITE ---
-  if (now - lastWriteTime >= WRITE_INTERVAL_MS && hasPendingData) {
-      String path = String("/sensor_readings/") + safePath;
-
-      Database.set<String>(aClient, (path + "/timestamp").c_str(), formattedTime, nullptr, "writeTask");
-      Database.set<float>(aClient, (path + "/p1_spu").c_str(), pendingData.p1_spu, nullptr, "writeTask");
-      Database.set<float>(aClient, (path + "/f1_lmin").c_str(), pendingData.f1, nullptr, "writeTask");
-      Database.set<float>(aClient, (path + "/f2_lmin").c_str(), pendingData.f2, nullptr, "writeTask");
-      Database.set<float>(aClient, (path + "/p2_spu").c_str(), pendingData.p2_spu, nullptr, "writeTask");
-      Database.set<int>(aClient, (path + "/label").c_str(), pendingData.label, nullptr, "writeTask");
+  if (now - lastWriteTime >= WRITE_INTERVAL_MS) {
+      String path = "/sensor_readings/" + safePath;
+      
+      // Use the Tutorial's Join Method for an Atomic Write
+      writer.create(obj1, "timestamp", formattedTime);
+      writer.create(obj2, "p1_spu", p1_spu);
+      writer.create(obj3, "f1_lmin", f1);
+      writer.create(obj4, "f2_lmin", f2);
+      writer.create(obj5, "p2_spu", p2_spu);
+      writer.create(obj6, "label", currentLabel); // Label is now locked to the data[cite: 2]
+      
+      // Join all 6 objects into one single jsonData object
+      writer.join(jsonData, 6, obj1, obj2, obj3, obj4, obj5, obj6);
+      
+      // Send the entire bundle as one request
+      Database.set<object_t>(aClient, path, jsonData, processData, "writeTask");
 
       lastWriteTime = now;
-      hasPendingData = false;
   }
 }
+// void loop() {
+//   app.loop();
+
+//   if (Serial.available()) {
+//     char c = Serial.read();
+//     if (c == '1') currentLabel = 1;
+//     if (c == '0') currentLabel = 0;
+//   }
+
+//   if (WiFi.status() != WL_CONNECTED) connectWiFi();
+
+//   uint32_t now = millis();
+//   if (now - prevMs < INTERVAL_MS) return;
+//   prevMs = now;
+
+//   noInterrupts();
+//   uint32_t p1Count = pulse1; uint32_t p2Count = pulse2;
+//   pulse1 = 0; pulse2 = 0;
+//   interrupts();
+
+//   float f1 = p1Count / FLOW_CAL;
+//   float f2 = p2Count / FLOW_CAL;
+
+//   uint32_t p1raw = 0, p2raw = 0;
+//   for (int i = 0; i < 250; i++) {
+//     p1raw += analogRead(P1_PIN);
+//     p2raw += analogRead(P2_PIN);
+//   }
+//   float v1 = (p1raw / 250.0f / 4095.0f) * 3.3f;
+//   float v2 = (p2raw / 250.0f / 4095.0f) * 3.3f;
+//   float p1_spu = (v1 - baseP1) * SPU_GAIN;
+//   float p2_spu = (v2 - baseP2) * SPU_GAIN;
+
+//   // --- NEW FORMATTING LOGIC ---
+//   struct tm timeinfo;
+//   if (!getLocalTime(&timeinfo)) {
+//     Serial.println("Time Error");
+//     return;
+//   }
+//     // Create the human-readable version for the data value
+//   char buf[25];
+//   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &timeinfo);
+//   String formattedTime = String(buf);
+
+//   // Create a sanitized version for the Firebase PATH (Key)
+//   // Example: "2026-05-04_22-57-07"
+//   char pathBuf[25];
+//   strftime(pathBuf, sizeof(pathBuf), "%Y-%m-%d_%H-%M-%S", &timeinfo);
+//   String safePath = String(pathBuf);
+
+//   // Serial Print
+//   Serial.print(formattedTime); Serial.print(",");
+//   Serial.print(p1_spu, 3);    Serial.print(",");
+//   Serial.print(f1, 3);        Serial.print(",");
+//   Serial.print(f2, 3);        Serial.print(",");
+//   Serial.print(p2_spu, 3);    Serial.print(",");
+//   Serial.println(currentLabel);
+
+//   pendingData = {formattedTime, p1_spu, f1, f2, p2_spu, currentLabel};
+//   hasPendingData = true;
+
+//   if (now - lastWriteTime >= WRITE_INTERVAL_MS) {
+//       String path = "/sensor_readings/" + safePath;
+      
+//       FirebaseJson json;
+//       json.add("timestamp", formattedTime);
+//       json.add("p1_spu", p1_spu);
+//       json.add("f1_lmin", f1);
+//       json.add("f2_lmin", f2);
+//       json.add("p2_spu", p2_spu);
+//       json.add("label", currentLabel);
+      
+//       // 1. Explicitly use json.raw() to convert to a String
+//       // 2. Ensure Database.set is called without an assignment
+//       Database.set<String>(aClient, path, json.raw(), nullptr, "writeTask");
+
+//       lastWriteTime = now;
+//       Serial.println("📤 Data queued for: " + safePath);
+//   }
+
+
+//   // // --- UPDATED FIREBASE WRITE ---
+//   // if (now - lastWriteTime >= WRITE_INTERVAL_MS && hasPendingData) {
+//   //     String path = String("/sensor_readings/") + safePath;
+
+//   //     Database.set<String>(aClient, (path + "/timestamp").c_str(), formattedTime, nullptr, "writeTask");
+//   //     Database.set<float>(aClient, (path + "/p1_spu").c_str(), pendingData.p1_spu, nullptr, "writeTask");
+//   //     Database.set<float>(aClient, (path + "/f1_lmin").c_str(), pendingData.f1, nullptr, "writeTask");
+//   //     Database.set<float>(aClient, (path + "/f2_lmin").c_str(), pendingData.f2, nullptr, "writeTask");
+//   //     Database.set<float>(aClient, (path + "/p2_spu").c_str(), pendingData.p2_spu, nullptr, "writeTask");
+//   //     Database.set<int>(aClient, (path + "/label").c_str(), pendingData.label, nullptr, "writeTask");
+
+//   //     lastWriteTime = now;
+//   //     hasPendingData = false;
+//   // }
+// }
 
 void processData(AsyncResult &aResult) {
   if (!aResult.isResult()) return;
