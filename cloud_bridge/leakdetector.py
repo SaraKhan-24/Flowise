@@ -19,51 +19,61 @@ model_path = os.getenv('MODEL_PATH')
 cred = firebase_admin.credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred, {'databaseURL': db_url})
 
+FEATURE_COLS = [
+    'F1_Lmin_Norm',
+    'F2_Lmin_Norm',
+    'Flow_Div_Norm',
+    'Flow_Div_Trend',
+    'P1_SPU_Norm',
+    'P2_SPU_Norm',
+    'Pres_Div_Norm',
+    'Pres_Div_Trend'
+]
+
 # Load model using the variable
+model = xgb.XGBClassifier()
 model.load_model(model_path)
 # --- CONFIGURATION ---
 WINDOW_SIZE = 30
 PREDICTION_HISTORY_SIZE = 5  # We look at the last 5 seconds of predictions
 STABLE_THRESHOLD = 3         # Require at least 3 out of 5 to confirm a leak
 
+MAX_FLOW = 30.0  # Max LPM for YF-S201
+MAX_PRES = 1200.0 # Max SPU for your pressure sensors
+
+# --- CONFIGURATION CONSTANTS ---
+# Based on your hardware analysis
+MAX_FLOW_LEAK = 2.5   # The max LPM divergence you expect (observed 2.14)
+MAX_PRES_DIV = 10.0   # Scale for pressure divergence
+FLOW_DEADBAND = 0.3   # Ignore anything below 0.3 LPM (clears your 0.27 noise)
+
 def create_features(df):
-    """Create rolling-normalized features using Title Case names"""
     df = df.copy()
     
-    # 1. Normalize Flows
-    f1_min = df['Flow_1_LPM'].rolling(window=WINDOW_SIZE, min_periods=1).min()
-    f1_max = df['Flow_1_LPM'].rolling(window=WINDOW_SIZE, min_periods=1).max()
-    f2_min = df['Flow_2_LPM'].rolling(window=WINDOW_SIZE, min_periods=1).min()
-    f2_max = df['Flow_2_LPM'].rolling(window=WINDOW_SIZE, min_periods=1).max()
+    # 1. Flow Divergence with Deadband
+    df['flow_div_raw'] = df['Flow_1_LPM'] - df['Flow_2_LPM']
+    # If noise is within deadband, force to 0
+    df.loc[df['flow_div_raw'].abs() < FLOW_DEADBAND, 'flow_div_raw'] = 0
     
-    df['Flow_1_LPM_Norm'] = (df['Flow_1_LPM'] - f1_min) / (f1_max - f1_min + 1e-6)
-    df['Flow_2_LPM_Norm'] = (df['Flow_2_LPM'] - f2_min) / (f2_max - f2_min + 1e-6)
+    # 2. Fixed Normalization (No more rolling min-max!)
+    # Map 0 -> 0.0 and MAX_FLOW_LEAK -> 1.0
+    df['Flow_Div_Norm'] = (df['flow_div_raw'] / MAX_FLOW_LEAK).clip(0, 1)
+    df['Flow_Div_Trend'] = df['flow_div_raw'].rolling(window=30, min_periods=1).mean()
     
-    # 2. Flow Divergence
-    df['flow_div'] = df['Flow_1_LPM'] - df['Flow_2_LPM']
-    flow_div_min = df['flow_div'].rolling(window=WINDOW_SIZE, min_periods=1).min()
-    flow_div_max = df['flow_div'].rolling(window=WINDOW_SIZE, min_periods=1).max()
-    df['Flow_Div_Norm'] = (df['flow_div'] - flow_div_min) / (flow_div_max - flow_div_min + 1e-6)
-    df['Flow_Div_Trend'] = df['flow_div'].rolling(window=WINDOW_SIZE, min_periods=1).mean()
+    # 3. Individual Flow Scaling (YF-S201 Max is ~30 LPM)
+    df['F1_Lmin_Norm'] = (df['Flow_1_LPM'] / 30.0).clip(0, 1)
+    df['F2_Lmin_Norm'] = (df['Flow_2_LPM'] / 30.0).clip(0, 1)
     
-    # 3. Normalize Pressures
-    p1_min = df['Pressure_1_SPU'].rolling(window=WINDOW_SIZE, min_periods=1).min()
-    p1_max = df['Pressure_1_SPU'].rolling(window=WINDOW_SIZE, min_periods=1).max()
-    p2_min = df['Pressure_2_SPU'].rolling(window=WINDOW_SIZE, min_periods=1).min()
-    p2_max = df['Pressure_2_SPU'].rolling(window=WINDOW_SIZE, min_periods=1).max()
+    # 4. Pressure Divergence Scaling
+    df['pres_div_raw'] = df['Pressure_2_SPU'] - df['Pressure_1_SPU']
+    df['Pres_Div_Norm'] = (df['pres_div_raw'] / MAX_PRES_DIV).clip(-1, 1)
+    df['Pres_Div_Trend'] = df['pres_div_raw'].rolling(window=30, min_periods=1).mean()
     
-    df['Pres_1_SPU_Norm'] = (df['Pressure_1_SPU'] - p1_min) / (p1_max - p1_min + 1e-6)
-    df['Pres_2_SPU_Norm'] = (df['Pressure_2_SPU'] - p2_min) / (p2_max - p2_min + 1e-6)
+    # 5. Individual Pressure Scaling (HK1100C Max is 1200 kPa)
+    df['P1_SPU_Norm'] = (df['Pressure_1_SPU'] / 1200.0).clip(0, 1)
+    df['P2_SPU_Norm'] = (df['Pressure_2_SPU'] / 1200.0).clip(0, 1)
     
-    # 4. Pressure Divergence
-    df['pres_div'] = df['Pressure_2_SPU'] - df['Pressure_1_SPU']
-    pres_div_min = df['pres_div'].rolling(window=WINDOW_SIZE, min_periods=1).min()
-    pres_div_max = df['pres_div'].rolling(window=WINDOW_SIZE, min_periods=1).max()
-    df['Pres_Div_Norm'] = (df['pres_div'] - pres_div_min) / (pres_div_max - pres_div_min + 1e-6)
-    df['Pres_Div_Trend'] = df['pres_div'].rolling(window=WINDOW_SIZE, min_periods=1).mean()
-    
-    return df.fillna(0)
-
+    return df[FEATURE_COLS].fillna(0)
 def is_reading_complete(reading):
     required_fields = ['timestamp', 'p1_spu', 'f1_lmin', 'f2_lmin', 'p2_spu']
     return all(field in reading for field in required_fields)
@@ -78,7 +88,7 @@ def get_readings_from_firebase():
             for ts_key, val in data_raw.items():
                 if isinstance(val, dict):
                     item = val.copy()
-                    item['timestamp'] = int(ts_key)
+                    item['timestamp'] = ts_key
                     if is_reading_complete(item): readings.append(item)
         elif isinstance(data_raw, list):
             for idx, val in enumerate(data_raw):
@@ -102,7 +112,7 @@ def update_firebase_label(timestamp, label):
         return False
 
 def detect_leak():
-    last_checked_timestamp = 0
+    last_checked_timestamp = ""
     prediction_history = []  # Buffer for Majority Vote
     
     print("🚀 Stabilized Leak Detector Active")
@@ -137,14 +147,7 @@ def detect_leak():
                 
                 # 1. Prediction
                 df_feat = create_features(df)
-                latest_features = df_feat.iloc[-1]
-                features = np.array([[
-                    latest_features['Flow_1_LPM_Norm'], latest_features['Flow_2_LPM_Norm'],
-                    latest_features['Flow_Div_Norm'], latest_features['Flow_Div_Trend'],
-                    latest_features['Pres_1_SPU_Norm'], latest_features['Pres_2_SPU_Norm'],
-                    latest_features['Pres_Div_Norm'], latest_features['Pres_Div_Trend'],
-                ]])
-                
+                features = df_feat.tail(1)
                 raw_pred = int(model.predict(features)[0])
                 confidence = float(model.predict_proba(features)[0][1])
 
