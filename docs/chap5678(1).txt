@@ -1,0 +1,570 @@
+﻿CHAPTER 5 
+IMPLEMENTATION 
+Chapter 5, we'll discuss into the practical side of our proposed project by discussing its 
+implementation. We'll focus on the key modules of our project and the specific machine learning techniques we've used to bring them to execution. Additionally, we'll provide main 
+code snippets to illustrate our i 
+implementation process. 
+Furthermore, we'll explore the interface design of our project, highlighting how users can interact with our app. This chapter will provide insights into how we turned our project idea 
+into a functional system. 
+First, we'll discuss the software and hardware we used to make sure everything runs smoothly on different devices. Then, we'll break down the app's design, showing how different parts work together and why we chose certain ways of doing things. 
+Next, we'll dive into the actual building process. We'll explain how we made the app record audio, analyze it to recognize speech problems, turn spoken words into text, and then read that text out loud. Along the way, we'll talk about the challenges we faced and how we solved them, like fixing bugs and making sure the app works well for everyone who needs it. 
+To sum up, this chapter is all about how we brought our app idea to life, making sure it's easy to use and helpful for people with speech difficulties. 
+5.1. Modules of Project 
+Following are the modules of our Project: 
+5.1.1. Audio Input Module 
+Following are the point of Audio Input Module of our Project: 
+• Objective: Capture audio input from either recorded files or live recordings using the device's microphone. 
+• Implementation Details: Utilize platform-specific APIs (e.g., Android's 
+Audio Record API) to capture audio data in real-time. For recorded files, 
+use file I/O operations to read audio data. 
+5.1.2. Feature Extraction Module 
+Figure 5.1 shows the feature extraction module of our Project. 
+40 
+• Objective: Extract relevant features from the input audio to characterize dysarthric speech patterns. 
+• Algorithms Used: VGGish (Visual Geometry Group's audio classification 
+• 
+model). 
+Implementation Details: Implement the VGGish feature extraction algorithm using pre-trained models available through TensorFlow and other deep learning frameworks. Extract features such as log-mel spectrograms to represent audio content. 
+def extract_embedding_from_audio(audio_path): 
+example = vggish_input.wavfile_to_examples (audio_path) embeddings = model.forward(example) 
+return embeddings.detach().numpy() 
+dys_files= dys_df[ 'Way_path'].tolist() non_dys files = non_dys_df[ 'Wav_path'].tolist() 
+def extract_embedding_from_audio(audio_path): 
+try: 
+example = vggish_input.wavfile_to_examples (audio_path) if example.nelement() == e: 
+return None 
+embeddings = model.forward(example) 
+return embeddings.detach().numpy() 
+except Exception as e: 
+print(f"Error processing file: (audio_path}") 
+return None 
+dys_embeddings = [extract_embedding_from_audio(file) for file in dys_files] 
+dys_embeddings = {emb for emb in dys_embeddings if emb is not None] filter out None values 
+non_dys_embeddings = [extract_embedding from audio(file) for file in non_dys_files] non_dys_embeddings = [emb for emb in non_dys_embeddings if emb is not None] # filter out None values «Error processing Tile: Dysarthris and Ron Dysarthria/Dataset/Male_Dysarthree)/133/Session2/K@V/8051+way Error processing file: Dysarthria and Non Dysarthria/Dataset/Male_Dysarthria/M3/Session2/Way/0052.wav Error processing file: Dysarthria and Non Dysarthria/Dataset/Male_Dysarthria/M3/Session2/Nav/0053.wav frror processing file: Dysarthria and Non Dysarthria/Dataset/Male_Dysarthria/M03/Session2/Way/8054.wav Error processing file: Dysarthria and Non Dysarthria/Dataset/Male_Dysarthria/MA03/Session2/Wav/8055.wav Error processing file: Dysarthria and Non Dysarthria/Dataset/Male_Dysarthria/M03/Session2/Way/0056.wav Error processing file: Dysarthria and Non Dysarthria/Dataset/Male Dysarthria/M03/Session2/av/0057.wav 
+Figure 5.1: Feature Extraction 
+5.1.3. Dysarthric Voice Detection Module 
+Figure 5.2 shows the Voice Detection module of our Project 
+• Objective: Determine whether the input audio contains characteristics of dysarthric speech. 
+• Algorithms Used: Support Vector Machine (SVM), Long Short-Term Memory (LSTM) networks, Convolutional Neural Networks (CNN), and Random Forest for classification, ensuring robust and accurate detection. These algorithms leverage deep learning and statistical methods to analyze complex speech patterns associated with dysarthria. 
+41 
+Implementation Details: Train multiple machine learning models including SVC, LSTM, CNN2D, and Random Forest using labeled datasets of dysarthric and non-dysarthric speech samples. Extracted features from the audio are used as input to each classification model for prediction. After evaluating the performance of each model, it was found that Random Forest achieved the best accuracy for dysarthric voice detection. Therefore, the Random Forest model is selected for integration 
+into the final application. 
+Random forest 
+J: rf RandomForestClassifier (n_estimators=100, random_state=42) 
+]: rf.fit(X_train, y_train) 
+1: RandomForestClassifier(random_state=42) 
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org. 
+}: y_pred = rf.predict(X_test) 
+}: accuracy = accuracy_score (y_test, y_pred) 
+report = classification_report (y_test, y_pred, target_names=["Non-dys", "dys"]) 
+]: print("Accuracy", accuracy) 
+print("\n Classification report: \n", report) 
+Accuracy 0.9256505576208178 
+Classification report: 
+precision recall fl-score 
+support 
+Non-dys 
+0.92 
+0.98 
+0.95 
+188 
+dys 
+0.94 
+0.80 
+0.87 
+81 
+0.93 
+269 
+accuracy 
+macro avg 
+0.93 
+0.89 
+0.91 
+269 
+weighted avg 
+0.93 
+0.93 
+0.92 
+269 
+Figure 5.2: Detection Module 
+5.1.4. Speech-to-Text Conversion Module 
+Figure 5.3 shows the STT Conversion module of our Project 
+• Objective: Convert dysarthric speech audio into text format to enhance 
+communication for individuals with speech impairments. This conversion facilitates seamless interaction with digital platforms 
+42 
+models). 
+⚫API/Service Used: Whisper model from OpenAI (or similar pre-trained 
+. Implementation Details: Utilize the Whisper model from OpenAl to transcribe dysarthric speech audio into text format. The audio data is processed using the pre-trained model, and the recognized text output is retrieved. This approach was chosen after experimenting with other pre- trained models and even exploring the possibility of training a custom model. However, Whisper from OpenAI provided the best results in terms of accuracy and performance for converting dysarthric speech into text. 
+openai.api_keyz"sk-FEKlaykwjgRR3iM2vZ1ST381bkFJP5YhteSiAashXyrD" 
+# File address stored in a variable 
+file_path = "D:\dys\Dysarthria and Nor. Dysarthria\Dataset \Female_dysarthria\FB1\Session1way8922.wav" 
+with open(file_path, "rb") as audio_file: 
+} 
+* Transcribe the audio 
+transcript = openai. Audio.transcribe( 
+filezaudio_file, 
+model="whisper-1", 
+response_format="text", language="en" 
+print(transcript) 
+and wish people all about my grandfather. 
+Figure 5.3: Speech-to-Text Conversion 
+5.1.5. Text-to-Speech Conversion Module 
+Figure 5.4 shows the TTS conversion module of our Project 
+• Objective: Convert the recognized text into audible speech. 
+• API/Service Used: Google Cloud Text-to-Speech API or similar. 
+• Implementation Details: Send the recognized text to the chosen API/service for synthesis into speech. Receive the synthesized speech 
+output and play it back through the device's speaker. 
+The module's implementation involves integrating the API into the system's architecture, handling API requests and responses, and managing the playback of synthesized speech. This integration is crucial for delivering a coherent and user-friendly experience, aligning with the system's overall functionality and objectives. 
+43 
+from Etts import RTTS 
+transcript 
+Assuring you already have the 'transcript' variable containing the text 
+tert to speak 
+Provide the Language (optional) 
+language 2 
+'en' 
+Amide the file name for the generated audio file output_file = 'output_audio.mp3' 
+tts=&TTS(text=text_to_speak, lang language, slow=False) 
+Initialize the gITS object with the text and Language 
+Save the generated speech to a tts.save(output file) 
+Play the audio file 
+os.system(f'start {output_file}') 
+file 
+Figure 5.4: Text-to-Speech Conversion 
+5.1.6. User Interface Module 
+Following are the points of user interface module of our Project: 
+• Objective: Provide a user-friendly interface for interacting with the app and displaying results. 
+• Implementation Details: Design intuitive user interfaces using the Flutter framework, which allows for cross-platform development across iOS and Android. Utilize Flutter's built-in widgets and libraries to create responsive and visually appealing UI elements. Incorporate features such as audio recording controls, result displays, and settings options seamlessly into the app's interface. By leveraging Flutter's flexible layout system and customizable widgets, ensure a consistent and engaging user experience across different devices and screen sizes. 
+5.1.7. Integration and Deployment Module 
+Figure 5.5 shows the integration and deployment module of our Project 
+• Objective: Integrate all modules together into a cohesive application and deploy it to target platforms. 
+• Implementation Details: Combine individual modules into a single 
+codebase, ensuring proper communication between components. Package the application for distribution through app stores (e.g., Google Play Store, Apple App Store) or as standalone executables for desktop platforms. 
+44 
+Assist Dysarthria 
+Chosen 
+Send 
+Tap to Record 
+Translation 
+("transcript":"and some in the winter the roofs or snow or ice prevent.\n") 
+Speaker 
+Figure 5.5: Integration and Deployment Module 
+5.2. Hardware Module Details 
+The Hardware Module includes all the physical components required for the 
+Dysarthric Voice App to function efficiently. This includes sensors, microphones, and processing units that capture and process speech data in real-time. These components work together to ensure accurate speech recognition and voice reconstruction, making the app responsive and effective for users with dysarthria. Here's what it involves: 
+5.2.1. Smartphone or Tablet 
+This is the device where the app runs, which could be a phone or smart device, such as an iPhone or an Android device. It provides the interface to interact with the app, process speech data, and access the features of the Dysarthric Voice App. 
+45 
+5.2.2. Microphone 
+This is what captures the sound. It could be the microphone built into the phone 
+or an external one you plug in. 
+5.2.3. Speaker 
+or Headphones 
+This is what lets you hear the app speaking back to you. It could be the speaker on your device or headphones you plug in. 
+5.2.4. Internet Connection: 
+Sometimes, the app 
+needs to connect to the internet to work properly. You can 
+use Wi-Fi or your phone's data connection for this. 
+5.3. Summary 
+Chapter 5 focuses on turning our project plans into reality. We used various tools and technologies, such as Flutter for building the app and Whisper from OpenAI for converting speech to text. Our main goal was to create an app that could understand and assist individuals with speech impairments. We organized the app's structure carefully, making it easy to add new features in the future. Key functionalities included recording audio, identifying speech problems using machine learning algorithms like Support Vector Machine (SVM) and LSTM networks, and converting spoken words into written text. We made sure the app looked appealing and was easy to use by designing a user-friendly interface with Flutter's help. This involved adding features like recording controls, result displays, and settings options. Throughout the implementation process, we encountered challenges such as ensuring 
+compatibility across different devices and solving bugs. However, by addressing these 
+challenges, we were able to create a reliable and efficient app that can make a meaningful 
+difference in the lives of individuals with speech impairments. 
+46 
+CHAPTER 6 
+RESULT, TESTING, ANALYSIS AND 
+VALIDATION 
+Chapter 6 dives into the outcomes of our project, focusing on testing, analyzing, and validating the Dysarthric Voice App. We'll discuss what we found out during testing, how we analyzed the results, and how we made sure the app works as intended. Let's explore the 
+successes and challenges 
+we encountered, ensuring the app's effectiveness and reliability in 
+aiding individuals with speech impairments. 6.1. Testing/Validating the Results and Achievements 
+Following part contain Testing/Validating the results and achievements: 6.1.1. Functional Testing Techniques 
+• Input Validation Testing: Verify that the app properly handles different types of audio input formats, including recorded files and live recordings. . Feature Testing: Test each feature of the app individually, such as audio recording, feature extraction, dysarthric voice detection, and speech-to-text 
+conversion. 
+• Boundary Value Testing: Test the app's behavior at the boundaries of acceptable input values, such as maximum recording duration or minimum audio quality thresholds. 
+6.1.2. Performance Testing Techniques 
+• Load Testing: Evaluate the app's performance under varying loads, including multiple concurrent users or large audio files, to ensure it remains responsive and efficient. This includes assessing how well the app handles increased traffic and data volume without compromising user 
+experience. 
+• Stress Testing: Subject the app to extreme usage conditions, such as 
+prolonged recording sessions or processing large volumes of audio data, to identify potential performance bottlenecks. This testing aims to push the app beyond normal operational limits to uncover issues that may not be 
+evident under standard conditions. 
+• Resource Usage Testing: Monitor the app's resource utilization, including CPU, memory, and battery usage, to ensure it does not excessively drain 
+device resources. 
+48 
+6.1.3. Accuracy Testing Techniques 
+• 
+· 
+or 
+Comparison Testing: Compare the app's output against ground truth data manually transcribed samples to measure the accuracy of dysarthric speech recognition and text conversion. 
+Error Analysis: Analyze the types and frequency of errors produced by the app, such as misinterpretations of speech patterns or inaccuracies in transcribed text, to identify areas for improvement. 
+Cross-Validation: Validate the app's accuracy across different datasets and speech patterns to ensure robust performance under varying conditions. 
+6.1.4. Testing Setup and Arrangements 
+. For testing dysarthric speech recognition, we utilized a diverse dataset containing recordings of individuals with varying degrees of speech impairments. 
+• 
+. The app was tested on both iOS and Android devices to ensure compatibility 
+across different platforms. 
+We employed standard testing procedures, including functional testing, performance testing, accuracy testing, usability testing, and validation with 
+end users. 
+6.1.5. Validation of Achievements 
+• The Dysarthric Voice App's achievements include its high accuracy in recognizing dysarthric speech patterns and its usability for individuals with speech impairments. 
+Validation with end users involved recruiting individuals with various speech impairments to use the app in real-world scenarios. This process included collecting feedback on the app's usability and effectiveness in everyday communication. The feedback helped fine-tune the app's features and address any practical issues encountered by users. 
+• Feedback from end users emphasized the app's effectiveness in accurately transcribing speech and its positive impact on their ability to communicate effectively. 
+49 
+6.2. Testing Scenarios 
+Table 6.1 indicates that a test case is a group of actions taken to determine whether the application satisfies the system's criteria as well as the performance operations or method correctly. The application needs to be rewritten if any of the test cases fail. for the purpose of Achieving the desired results. according to the instructions provided in order for the application function properly. Both functional and non-functional requirements must be met by the 
+6.2.1. Test Case 1- Usability Testing 
+10 
+application. 
+Table 6.1 involves evaluating the app's ease of use and user interaction experience. Conducted during the unit testing stage on May 15, 2024, this test was performed by M Jawad Ashraf and Areeba. The test confirmed that the app met usability standards and provided a positive user experience, resulting in a pass. 
+Table 6.1: Test Case 1-Usability Testing 
+GENERAL INFORMATION 
+Test Stage 
+✓Unit 
+Usability Testing 
+Test Date 
+2024-05-15 
+System Date, if 
+2024-05-15 
+applicable: 
+Tester 
+M Jawad Ashraf 
+Areeba 
+Test Case Number: T #001 
+Test Case 
+Description 
+Results 
+This test evaluates the app's ease of use and user interaction experience. 
+Pass 
+Incident Number, 
+N/A 
+if applicable: 
+Requirement(s) 
+to be tested 
+Roles and 
+Responsibilities 
+INTRODUCTION 
+Evaluate the app's ease of use and user interaction experience. 
+All the group members tested this system individually for identifying 
+any problem. 
+Set Up Procedures 
+Stop 
+Procedures 
+Hardware 
+Software 
+Procedural Requirements 
+Install the app, prepare the testing environment, review testing criteria, and brief testers. 
+End test after scenarios are assessed, document results, and reset or uninstall as needed. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+TensorFlow or PyTorch for implementing VGGish and dysarthria detection algorithm, Python IDEs and Text-to-speech synthesis tools 
+Execution of this test case requires no constraint. 
+6.2.2. Test Case 2- Live Recording Validation 
+Table 6.2 involves recording dysarthric voice using the live recording feature. Conducted during the functionality testing stage on May 15, 2024, this test was performed by Areeba and M Jawad Ashraf. The test successfully confirmed that the live recording feature functioned as intended, resulting i 
+a pass. 
+Table 6.2: Test Case 2- Live Recording Validation 
+GENERAL INFORMATION 
+Test Stage 
+Functionality 
+Test Date 
+Live Recording Validation 
+Tester 
+2024-05-15 
+Areeba 
+M Jawad Ashraf 
+System Date, if applicable: 
+2024-05-15 
+Test Case Number: 
+T # 002 
+Test Case Description 
+Results 
+This test involves recording dysarthric voice using the live recording 
+feature. 
+Pass 
+Incident Number, 
+N/A 
+if applicable: 
+51 
+Requirement(s) 
+to be tested 
+Roles and 
+Responsibilities 
+Set Up Procedures 
+Stop Procedures 
+Hardware 
+Software 
+Procedural Requirements 
+INTRODUCTION 
+Validate the functionality of recording dysarthric voice using the live recording feature. 
+Tester Areeba and M Jawad Ashraf perform the recording and validate functionality, development team addresses 
+any issues. 
+Install the app, ensure the live recording feature is functional, and configure the test environment. 
+End test after recording is completed, document results, and reset the system if required. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+TensorFlow or PyTorch for implementing VGGish and dysarthria detection algorithm, Python IDEs and Text-to-speech synthesis tools Execution of this test case requires no constraint. 
+6.2.3. Test Case 3- Audio File Upload Validation 
+Table 6.3 involves uploading a pre-recorded dysarthric voice audio file. 
+Conducted during the functionality testing stage on May 15, 2024, this test was performed by Areeba and M Jawad Ashraf. The test successfully verified that the system could upload and process the pre-recorded audio file as expected, resulting in a 
+pass. 
+Test Stage 
+Test Date 
+Table 6.3: Test Case 3- Audio File Upload Validation 
+GENERAL INFORMATION 
+Functionality 
+Audio File Upload Validation 
+2024-05-15 
+System Date, if 
+2024-05-15 
+applicable: 
+52 
+Tester 
+Areeba 
+M Jawad Ashraf 
+Test Case Number: 
+T # 003 
+This test involves uploading a pre-recorded dysarthric voice audio 
+Test Case 
+Description Results 
+file. 
+✓ Pass 
+Incident Number, 
+N/A 
+if applicable: 
+Requirement(s) 
+to be tested 
+Roles and 
+Responsibilities 
+Set Up 
+Procedures 
+Stop 
+Procedures 
+Hardware 
+Software 
+Procedural 
+Requirements 
+INTRODUCTION 
+Validate the functionality of uploading a pre-recorded dysarthric voice audio file. 
+Tester Areeba and M Jawad Ashraf perform the upload and validate functionality, development team addresses any issues. 
+Install the app, prepare a pre-recorded dysarthric voice file, and configure the test environment. 
+End test after file upload is completed, document results, and reset the system if necessary. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+TensorFlow or PyTorch for implementing VGGish and dysarthria 
+detection algorithm, Python IDEs and Text-to-speech synthesis 
+tools 
+Execution of this test case requires no constraint. 
+6.2.4. Test Case 4- Feature Extraction Validation 
+Table 6.4 involves initiating feature extraction using the VGGish algorithm. Conducted during the functionality testing stage on May 15, 2024, this test was performed by M Jawad Ashraf. The test successfully verified that the system effectively initiated and executed feature extraction with the VGGish algorithm, resulting in a pass. This ensured that the system could accurately process and analyze 
+audio features as intended. 
+53 
+Test Stage 
+Table 6.4: Test Case 4- Feature Extraction Validation 
+GENERAL INFORMATION 
+Functionality 
+Feature Extraction Validation 
+2024-05-15 
+Test Date 
+System Date, if 
+2024-05-15 
+applicable: 
+M Jawad Ashraf 
+Tester 
+Test Case Number: 
+T # 004 
+Test Case. 
+Description Results 
+This test involves initiating feature extraction using the VGGish 
+Algorithm. 
+Pass 
+Incident Number, if applicable: 
+N/A 
+Requirement(s) 
+to be tested 
+Roles and 
+Responsibilities 
+Set Up 
+Procedures 
+Stop 
+Procedures 
+Hardware 
+Software 
+Procedural Requirements 
+INTRODUCTION 
+Validate the initiation and accuracy of feature extraction using the VGGish Algorithm. 
+Tester M Jawad Ashraf performs the feature extraction and validates functionality, development team addresses any issues. 
+Install the app, ensure the VGGish Algorithm is integrated, and 
+configure the test environment. 
+End test after feature extraction is completed, document results, and 
+reset the system if necessary. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+TensorFlow or PyTorch for implementing VGGish and dysarthria detection algorithm, Python IDEs and Text-to-speech synthesis 
+tools 
+Execution of this test case requires no constraint. 
+54 
+6.2.5. Test Case 5- Dysarthric Voice Detection Accuracy 
+Table 6.5 involves detecting dysarthric voice using the features extracted from the previous step. Conducted during the functionality testing stage on May 15, 2024, 
+this test was 
+performed by Areeba and M Jawad Ashraf. The test successfully confirmed that the system accurately detected dysarthric voice based on the extracted features, resulting in a pass. 
+Test Stage 
+Table 6.5: Test Case 5- Dysarthric Voice Detection Accuracy 
+GENERAL INFORMATION 
+Functionality 
+Dysarthric Voice Detection Accuracy 
+Test Date 
+2024-05-15 
+System Date, if 
+applicable: 
+2024-05-15 
+Tester 
+M Jawad Ashraf 
+Areeba 
+Test Case Number: 
+T # 005 
+Test Case Description 
+Results 
+This test accurately detects dysarthric voice using extracted features. 
+Pass 
+Incident Number, 
+if applicable: 
+N/A 
+Requirement(s) 
+to be tested 
+Roles and 
+Responsibilities 
+Set Up 
+Procedures 
+Stop 
+Procedures 
+Hardware 
+INTRODUCTION 
+Validate the accuracy of dysarthric voice detection using extracted 
+features. 
+Testers M Jawad Ashraf and Areeba perform the detection and validate accuracy, development team addresses any issues. 
+Install the app, ensure feature extraction is complete, and configure the test environment. 
+End test after detection is completed, document results, and reset the system if necessary. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+55 
+Software 
+Procedural 
+Requirements 
+TensorFlow or PyTorch for implementing VGGish and dysarthria 
+detection algorithm, Python IDEs and Text-to-speech synthesis tools 
+Execution of this test case requires no constraint. 
+6.2.6. Test Case 6- Speech-to-Text Conversion Validation 
+Table 6.6 involves converting dysarthric voice to text using the Whisper OpenAI model. Conducted during the functionality testing stage on May 15, 2024, this s performed by Areeba. The test successfully verified that the Whisper OpenAI model accurately converted dysarthric voice into text, resulting in a pass. 
+test was 
+Table 6.6: Test Case 6- Speech-to-Text Conversion Validation 
+GENERAL INFORMATION 
+Test Stage 
+✓ Functionality 
+Speech-to-Text Conversion Validation 
+Test Date 
+2024-05-15 
+System Date, if 
+2024-05-15 
+applicable: 
+Tester 
+Areeba 
+Test Case Number: 
+T # 006 
+Test Case 
+Description 
+Results 
+This test converts dysarthric voice to text using Whisper OpenAI 
+model. 
+✓Pass 
+Incident Number, N/A 
+if applicable: 
+Requirement(s) 
+to be tested 
+Roles and 
+Responsibilities 
+Set Up Procedures 
+INTRODUCTION 
+Validate the conversion of dysarthric voice to text using the Whisper OpenAI model. 
+Tester Areeba performs the conversion and validates functionality; development team addresses any issues. 
+Install the app, ensure the Whisper OpenAI model is integrated, and configure the test environment. 
+56 
+Stop 
+Procedures 
+Hardware 
+Software 
+Procedural 
+Requirements 
+End test after conversion is completed, document results, and reset the system if necessary. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+TensorFlow or PyTorch for implementing VGGish and dysarthria 
+detection algorithm, Python IDEs and Text-to-speech synthesis tools 
+Execution of this test case requires no constraint. 
+6.2.7. Test Case 7- Text-to-Speech Synthesis Validation 
+Table 6.7 involves synthesizing text to voice using Google Voice. Conducted during the functionality testing stage on May 15, 2024, this test was performed by M Jawad Ashraf and Areeba. The test successfully confirmed that the system effectively synthesized text into voice using Google Voice, resulting in a pass. 
+Table 6.7: Test Case 7- Text-to-Speech Synthesis Validation 
+GENERAL INFORMATION 
+Test Stage 
+✓ Functionality 
+Text-to-Speech Synthesis Validation 
+Test Date 
+2024-05-15 
+System Date, if 
+2024-05-15 
+applicable: 
+Tester 
+M Jawad Ashraf 
+Areeba 
+Test Case Number: 
+T#007 
+Test Case 
+This test synthesizes text to voice using Google Voice. 
+Description 
+Results 
+✓Pass 
+Incident Number, if applicable: 
+NA 
+57 
+Requirement(s) to be tested Roles and 
+Responsibilities 
+Set Up 
+Procedures 
+Stop Procedures 
+Hardware 
+Software 
+Procedural 
+Requirements 
+6.3. Summary 
+INTRODUCTION 
+Validate the synthesis of text to voice using Google Voice. 
+Testers M Jawad Ashraf and Areeba perform the synthesis and validate functionality, development team addresses any issues. 
+Install the app, ensure Google Voice synthesis integration, and configure the test environment. 
+End test after synthesis is completed, document results, and reset the system if necessary. 
+ENVIRONMENTAL NEEDS 
+Powerful servers or cloud computing resources, devices like computers, tablets, and smartphones. 
+TensorFlow or PyTorch for implementing VGGish and dysarthria detection algorithm, Python IDEs and Text-to-speech synthesis 
+tools 
+Execution of this test case requires no constraint. 
+Chapter 6 is all about making sure our Dysarthric Voice App works well and does what it's supposed to do. We tested it in different ways to check if it recognizes speech problems correctly, works fast, and is easy to use. We used various techniques like listening to people with speech difficulties using the app and looking at how it performed with different types of speech. The results were good overall: the app recognized speech problems accurately, worked quickly, and users found it easy to use. People who used the app said it helped them communicate better, which was our main goal. Overall, the testing and analysis showed that the Dysarthric Voice App is reliable and helpful for people with speech impairments. 
+58 
+CHAPTER 7 
+CONCLUSION AND FUTURE WORK 
+future 
+In Chapter 7, we present the concluding remarks and discuss potential avenues for e development of the Dysarthric Voice App. This chapter encapsulates the key findings, achievements, and insights gained throughout the project journey. We reflect on the significance of our work, address any limitations encountered, and propose areas for further research and enhancement. Let's delve into the culmination of our project and explore the possibilities for its continued evolution and impact in the future. 
+7.1. Brief Review / Claims / Future Recommendations 
+7.1.1. Brief Review 
+Our project creates an app for people with dysarthria, analyzing voice inputs to detect dysarthric speech. Using VGGish for feature extraction and Whisper OpenAI for speech-to-text, it converts dysarthric speech into text, then uses Google Voice to turn text back into understandable speech, aiding communication. 
+7.1.2. Achievements 
+We made an app to help people who have trouble speaking clearly. Using fancy technology like VGGish and Whisper OpenAI, the app understands speech better. It changes unclear speech into written words and then back into understandable speech. We also added Google Voice to make the app speak the written words out loud, so it's easier for people with speech problems to communicate. 
+7.1.3. Limitations 
+Our app tries its best to spot speech problems, but sometimes it might miss them. It might struggle with understanding some types of unclear speech, which could lead to mistakes. Also, when it turns speech into text, it might not always get it right, making errors. Furthermore, it might not work well in noisy places or with different accents. Knowing these limits helps us make the app better in the future. 
+7.1.4. Claims 
+Our app is designed to recognize when someone's speech is hard to understand. It accurately turns unclear speech into written words and then effectively changes those words back into clear speech. This helps people with speech problems communicate 
+more easily. 
+60 
+7.1.5. Future Recommendations 
+We aim to enhance our app by making it better at recognizing various speech problems. This includes improving the accuracy of transforming unclear speech into written words and enhancing the process of converting written words back into clear speech. Additionally, we're focused on making the app more user-friendly for individuals with speech difficulties, ensuring it's accessible and easy to use for 
+everyone. 
+1.2. Summary 
+In conclusion, the app we created is a helpful tool for people with speech difficulties. It can understand their speech and turn it into text, then change the text back into speech. While there are areas where enhancements can be made, we're optimistic about the app's potential to significantly improve communication for individuals facing speech challenges, like better accuracy and usability, we're excited about the potential to make communication easier for 
+those who need it. 
+61
