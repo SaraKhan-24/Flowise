@@ -27,7 +27,7 @@ const float SPU_GAIN = 370.0;
 // ---------------- STATE ----------------
 volatile uint32_t pulse1 = 0, pulse2 = 0;
 float baseP1 = 0.0, baseP2 = 0.0;
-const int DEFAULT_LABEL = 0;  // Always assume "Normal" until told otherwise
+const int DEFAULT_LABEL = -1;  // -1 indicates raw unprocessed data (pending ML verification)
 int currentLabel = DEFAULT_LABEL;
 uint32_t prevMs = 0;
 
@@ -69,13 +69,48 @@ void IRAM_ATTR count1() { pulse1++; }
 void IRAM_ATTR count2() { pulse2++; }
 
 // ---------------- HELPERS ----------------
+// void connectWiFi() {
+//   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+//   Serial.print("Connecting WiFi");
+//   uint8_t attempts = 0;
+//   while (WiFi.status() != WL_CONNECTED && attempts < 40) {
+//     Serial.print(".");
+//     delay(250);
+//     attempts++;
+//   }
+//   Serial.println();
+
+//   if (WiFi.status() == WL_CONNECTED) {
+//     Serial.print("WiFi OK. IP: ");
+//     Serial.println(WiFi.localIP());
+//   } else {
+//     Serial.println("WiFi failed.");
+//   }
+// }
+#include <esp_wifi.h> // Put this at the very top of your main file with other includes
+
 void connectWiFi() {
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting WiFi");
+  WiFi.disconnect(true); // Clear any previous configuration
+  delay(1000);
+  
+  WiFi.mode(WIFI_STA);
+
+  // Configure WPA2 Enterprise Credentials
+  esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)WIFI_IDENTITY, strlen(WIFI_IDENTITY));
+  esp_wifi_sta_wpa2_ent_set_username((uint8_t *)WIFI_IDENTITY, strlen(WIFI_IDENTITY));
+  esp_wifi_sta_wpa2_ent_set_password((uint8_t *)WIFI_PASSWORD, strlen(WIFI_PASSWORD));
+  
+  // Enable WPA2 Enterprise
+  esp_wifi_sta_wpa2_ent_enable();
+  
+  // Begin connection using only the SSID
+  WiFi.begin(WIFI_SSID);
+  
+  Serial.print("Connecting to Campus WiFi");
   uint8_t attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 40) {
+  while (WiFi.status() != WL_CONNECTED && attempts < 60) { // Increased timeout for Enterprise handshakes
     Serial.print(".");
-    delay(250);
+    delay(500);
     attempts++;
   }
   Serial.println();
@@ -84,10 +119,9 @@ void connectWiFi() {
     Serial.print("WiFi OK. IP: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("WiFi failed.");
+    Serial.println("Campus WiFi connection failed.");
   }
 }
-
 void calibrateBaseline() {
   Serial.println("Calibrating baseline... KEEP PUMP OFF");
   delay(3000);
