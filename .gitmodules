@@ -1,0 +1,3 @@
+[submodule "mobile_app/Flowise"]
+	path = mobile_app/Flowise
+	url = https://github.com/BbatoolTariq/Flowise.git

@@ -137,17 +137,14 @@ This chapter describes the functional and non-functional requirements of FlowWis
 ESP32, YF-S201, HK1100C, XGBoost, Firebase, Python, Flutter, Arduino IDE.
 
 3.3. Functional Requirements
-3.3.1. Leak Detection Intelligence Module  
-Computes rolling-window features and predicts leaks using XGBoost.
+3.3.1. Cloud-Hosted Leak Detection & Inference Module  
+Ingests incoming telemetry, computes rolling temporal/differential features, and predicts leak events in real time using a pre-trained XGBoost classifier. Implements dual-stage post-inference filters (confidence-thresholding and temporal majority voting) to suppress noise and false alerts.
 
-3.3.2. IoT Data Acquisition Module  
-Captures flow and pressure data with the ESP32 and uploads to Firebase.
+3.3.2. IoT Data Acquisition & Edge Telemetry Module  
+Captures raw flow pulses and analog pressure signals using an ESP32 edge microcontroller, converts them to physical units (L/min and scaled pressure), calibrates pressure baselines, and transmits NTP-synchronized telemetry packages atomically to Firebase every 2 seconds.
 
-3.3.3. Analytics and Notification Module  
-Displays real-time flow/pressure charts and sends leak alerts.
-
-3.3.4. Consumer Usage Module  
-Provides summarized flow usage metrics for consumers.
+3.3.3. Multi-Platform Analytics & Admin Monitoring Module  
+Provides administrators with interactive web (Streamlit) and mobile (Flutter) dashboard consoles featuring real-time graphical charting, active telemetry node connection heartbeat monitoring, state-aware SVG pipe flow visualizations, administrative maintenance controls, and historical log exports.
 
 3.4. Non-Functional Requirements
 • High recall for leak detection.  

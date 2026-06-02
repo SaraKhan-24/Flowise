@@ -72,33 +72,9 @@ void IRAM_ATTR count1() { pulse1++; }
 void IRAM_ATTR count2() { pulse2++; }
 
 // ---------------- HELPERS ----------------
-// void connectWiFi() {
-//   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-//   Serial.print("Connecting WiFi");
-//   uint8_t attempts = 0;
-//   while (WiFi.status() != WL_CONNECTED && attempts < 40) {
-//     Serial.print(".");
-//     delay(250);
-//     attempts++;
-//   }
-//   Serial.println();
-
-//   if (WiFi.status() == WL_CONNECTED) {
-//     Serial.print("WiFi OK. IP: ");
-//     Serial.println(WiFi.localIP());
-//   } else {
-//     Serial.println("WiFi failed.");
-//   }
-// }
-
 void connectWiFi() {
-  esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)WIFI_IDENTITY, strlen(WIFI_IDENTITY));
-  esp_wifi_sta_wpa2_ent_set_username((uint8_t *)WIFI_IDENTITY, strlen(WIFI_IDENTITY));
-  esp_wifi_sta_wpa2_ent_set_password((uint8_t *)WIFI_PASSWORD, strlen(WIFI_PASSWORD));
-  WiFi.begin(WIFI_SSID);
-  esp_wifi_sta_wpa2_ent_enable();
-  
-  Serial.print("Connecting WiFi (WPA2-Enterprise)");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting WiFi");
   uint8_t attempts = 0;
   while (WiFi.status() != WL_CONNECTED && attempts < 40) {
     Serial.print(".");
@@ -114,6 +90,32 @@ void connectWiFi() {
     Serial.println("WiFi failed.");
   }
 }
+
+
+// void connectWiFi() {
+//   // If using WPA2-Enterprise (common on campus networks):
+//   esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)WIFI_IDENTITY, strlen(WIFI_IDENTITY));
+//   esp_wifi_sta_wpa2_ent_set_username((uint8_t *)WIFI_USERNAME, strlen(WIFI_USERNAME));
+//   esp_wifi_sta_wpa2_ent_set_password((uint8_t *)WIFI_PASSWORD, strlen(WIFI_PASSWORD));
+//   WiFi.begin(WIFI_SSID);
+//   esp_wifi_sta_wpa2_ent_enable();
+  
+//   Serial.print("Connecting to WiFi (Enterprise)");
+//   uint8_t attempts = 0;
+//   while (WiFi.status() != WL_CONNECTED && attempts < 40) {
+//     Serial.print(".");
+//     delay(250);
+//     attempts++;
+//   }
+//   Serial.println();
+
+//   if (WiFi.status() == WL_CONNECTED) {
+//     Serial.print("✅ WiFi OK. IP: ");
+//     Serial.println(WiFi.localIP());
+//   } else {
+//     Serial.println("❌ WiFi failed. Check credentials & network type.");
+//   }
+// }
 void calibrateBaseline() {
   Serial.println("Calibrating baseline... KEEP PUMP OFF");
   delay(3000);
