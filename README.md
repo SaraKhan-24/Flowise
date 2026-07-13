@@ -79,12 +79,6 @@ The user interface is built with Flutter and features a responsive glassmorphic 
 
 ---
 
-## 📽️ System Demonstration
-
-A full walk-through video demonstrating the hardware prototype responding to real-time leaks and notifying the Flutter app is available locally:
-- 🎥 **Demo Video**: [Video Project 4.mp4](file:///home/sara/Desktop/FYP/Flowise/assets/images/Video%20Project%204.mp4)
-
----
 
 ## ⚙️ Setup & Deployment
 
