@@ -74,6 +74,7 @@ evaluation_data/
 trainingdata/
 tuning_data/
 docs/
+Diagrams/
 
 # Large Video Files (exceeding GitHub limits)
 *.mp4
